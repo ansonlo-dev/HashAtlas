@@ -1,0 +1,113 @@
+# HashAtlas analysis configuration. Every value is read by the pipeline; changing it changes the run.
+# Reasons for each default are given in reports/technical_report.md (section numbers in comments).
+
+project:
+  name: "HashAtlas: Can a Small Bitcoin Miner Still Win?"
+  data_version: "btc-blocks-2009-2026-r1"
+  model_version: "ha-m1"
+  random_seed: 3004
+
+sources:
+  blockchair_dump_url: "https://gz.blockchair.com/bitcoin/blocks/blockchair_bitcoin_blocks_{date}.tsv.gz"
+  blockchair_terms: "https://blockchair.com/dumps (free dumps; cite Blockchair)"
+  pools_definitions_url: "https://raw.githubusercontent.com/mempool/mining-pools/master/pools-v2.json"
+  mempool_api: "https://mempool.space/api/v1"
+  blockchain_charts_url: "https://api.blockchain.info/charts/{chart}?timespan=all&format=json&sampled=false"
+  charts: ["hash-rate", "difficulty", "market-price", "miners-revenue", "transaction-fees", "n-transactions"]
+  electricity_url: "https://www.globalpetrolprices.com/electricity_prices/"
+  user_agent: "HashAtlas-educational-pipeline/1.0 (CDS3004 coursework)"
+  first_day: "2009-01-03"
+  # Analysis freeze: everything up to this day is "history". Later blocks are kept aside as genuinely new,
+  # unseen examples for the decision demonstration (section 11).
+  freeze_day: "2026-10-31"
+  # Blockchair dumps are used for 2009-2018; from 2019-01-01 (height 556,459) every block comes from mempool.space
+  # (the free dump quota was exhausted, and mempool.space's own pool attribution is the better label for this era).
+  dumps_last_day: "2018-12-31"
+  mempool_start_height: 556459
+  last_day: "2026-11-11"
+  parallel_downloads: 4
+  label_check_samples: 120     # random mempool.space /blocks/{height} calls (15 blocks each) to audit our labels
+
+# Section 4: hardware eras, used only to *check* what the unsupervised era discovery finds (never as a feature).
+eras:
+  - {name: "CPU", start: "2009-01-03"}
+  - {name: "GPU", start: "2010-07-18"}     # first public OpenCL GPU miner (July 2010)
+  - {name: "FPGA/early ASIC", start: "2011-06-01"}
+  - {name: "ASIC", start: "2013-01-31"}    # first ASIC block (Avalon, Jan 2013)
+  - {name: "Industrial ASIC", start: "2016-06-01"}   # Antminer S9 ships (mid-2016)
+
+# Section 6-8: block fingerprinting (solo vs pool) is learnt in the era where labels are reliable.
+classification:
+  start: "2019-01-01"
+  train: ["2019-01-01", "2024-01-01"]
+  validation: ["2024-01-01", "2025-04-01"]
+  test: ["2025-04-01", "2026-11-01"]
+  new: ["2026-11-01", "2026-11-12"]
+  cv_folds: 5
+  nested_outer_folds: 5
+  nested_inner_folds: 3
+  pool_negative_sample: 60000   # stratified-by-month pool blocks kept for model search (all solo blocks kept)
+  tree:
+    criterion: ["gini", "entropy"]
+    max_depth: [2, 3, 4, 5, 6, 8, null]
+    min_samples_leaf: [1, 5, 20, 50]
+    class_weight: [null, "balanced"]
+  knn:
+    n_neighbors: [3, 5, 11, 21, 41]
+    weights: ["uniform", "distance"]
+    metric: ["manhattan", "euclidean"]
+  svm_linear:
+    C: [0.01, 0.1, 1.0, 10.0]
+  svm_rbf:
+    C: [0.3, 1.0, 3.0, 10.0]
+    gamma: ["scale", 0.01, 0.1]
+  svm_max_train_rows: 12000
+  min_precision_for_threshold: 0.50   # operating point: highest recall with precision >= 0.50 on validation
+
+# Section 9: unsupervised era discovery and pool families.
+clustering:
+  day_k_range: [2, 10]
+  n_init: 25
+  reference_rows: 1500
+  min_pool_blocks: 300          # pools with fewer recent blocks are too thin for a stable fingerprint profile
+  pool_window: ["2024-01-01", "2026-11-01"]
+  dbscan_min_samples: [5, 10, 20]
+  dbscan_eps_quantiles: [0.90, 0.95, 0.98]
+
+# Section 10: association rules on modern blocks.
+association:
+  window: ["2023-01-01", "2026-11-01"]
+  confirm_window: ["2025-04-01", "2026-11-01"]
+  min_support: 0.02
+  min_confidence: 0.50
+  max_len: 4
+  solo_min_support_count: 30
+
+# Section 11-12: miner decisions and the future lab.
+decision:
+  pool_fee: 0.02                   # typical FPPS pool fee
+  blocks_per_day: 144
+  default_devices:
+    - {name: "Bitaxe-class home miner", ths: 1.2, watts: 18}
+    - {name: "Antminer S19j Pro", ths: 104, watts: 3068}
+    - {name: "Antminer S21", ths: 200, watts: 3500}
+    - {name: "Antminer S21 XP Hyd", ths: 473, watts: 5676}
+  countries: ["Hong Kong", "China", "Japan", "South Korea", "Singapore", "Taiwan", "Malaysia", "Thailand",
+              "Vietnam", "Indonesia", "Philippines", "India", "Kazakhstan", "Russia", "Bhutan", "Laos",
+              "United States", "Canada", "Paraguay", "Ethiopia", "Norway", "Germany", "United Kingdom",
+              "United Arab Emirates", "Iran", "Argentina", "El Salvador", "Australia"]
+  asia: ["Hong Kong", "China", "Japan", "South Korea", "Singapore", "Taiwan", "Malaysia", "Thailand", "Vietnam",
+         "Indonesia", "Philippines", "India", "Kazakhstan", "Bhutan", "Laos"]
+
+future:
+  halving_height: 1050000
+  subsidy_now_btc: 3.125
+  horizon_days: 900                # to mid-2029, beyond the 2028 halving
+  n_paths: 4000
+  growth_window_start: "2017-01-01"   # resample 30-day hashrate growth from the industrial-ASIC era only
+  backtest_origins: ["2019-05-01", "2020-05-11", "2022-01-01", "2024-04-20"]
+  backtest_horizon_days: 540
+  fee_share_scenarios: [0.01, 0.05, 0.15]
+
+bootstrap:
+  n_resamples: 500

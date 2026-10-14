@@ -1,0 +1,35 @@
+[project]
+name = "hashatlas"
+version = "1.0.0"
+description = "HashAtlas: can a small Bitcoin miner still win? Block fingerprints, mining eras and miner decisions (CDS3004 group project)"
+authors = [{ name = "ansonlo.dev" }]
+requires-python = ">=3.12"
+dependencies = [
+    "joblib>=1.6.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "pandas>=3.1.1",
+    "pyarrow>=26.0.1",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.16,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "nbclient>=0.11.0",
+    "nbformat>=5.11.1",
+    "pytest>=9.2.0",
+]
+
+[project.scripts]
+hashatlas = "hashatlas.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
