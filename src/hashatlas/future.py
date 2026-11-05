@@ -37,12 +37,17 @@ def simulate(logh: pd.Series, origin: pd.Timestamp, start: str, horizon: int, n_
     return logh.loc[:origin].iloc[-1] + np.c_[np.zeros(n_paths), np.cumsum(steps, axis=1)]
 
 
-def backtest(logh: pd.Series, seed: int) -> dict:
+METHODS = {"since-2017": lambda origin: min(pd.Timestamp(cfg()["future"]["growth_window_start"], tz="UTC"),
+                                            origin - pd.Timedelta(days=730)),
+           "last-3-years": lambda origin: origin - pd.Timedelta(days=1095)}
+
+
+def backtest(logh: pd.Series, seed: int, method: str) -> dict:
     c = cfg()["future"]
     rows = []
     for o in c["backtest_origins"]:
         origin = logh.index[logh.index.get_indexer([pd.Timestamp(o, tz="UTC")], method="nearest")[0]]
-        start = min(pd.Timestamp(c["growth_window_start"], tz="UTC"), origin - pd.Timedelta(days=730))
+        start = METHODS[method](origin)
         paths = simulate(logh, origin, str(start.date()), c["backtest_horizon_days"], 2000, seed)
         # simple comparators: persistence (no growth) and trailing 1-year trend extrapolation
         trend = (logh.loc[:origin].iloc[-1] - logh.loc[:origin - pd.Timedelta(days=365)].iloc[-1]) / 365
@@ -61,7 +66,7 @@ def backtest(logh: pd.Series, seed: int) -> dict:
     df = pd.DataFrame(rows)
     summ = {"cases": len(df), "coverage_80pct_band": float(df["inside_80pct_band"].mean()),
             "mae_pct": {k: float(df[f"{k}_error_pct"].abs().mean()) for k in ("median", "persistence", "trend")}}
-    return {"rows": rows, "summary": summ}
+    return {"method": method, "rows": rows, "summary": summ}
 
 
 def run() -> dict:
@@ -70,10 +75,13 @@ def run() -> dict:
     seed = c["project"]["random_seed"]
     logh = series()
     origin = logh.index[-1]
-    paths = simulate(logh, origin, fc["growth_window_start"], fc["horizon_days"], fc["n_paths"], seed)
-    # sensitivity: growth resampled from the last three years only
-    recent = simulate(logh, origin, str((origin - pd.Timedelta(days=1095)).date()), fc["horizon_days"],
-                      fc["n_paths"], seed + 1)
+    # Declared rule: the resampling window with the lower backtest mean |error| of the median path drives the
+    # main scenario; the other window is kept as a sensitivity line.
+    bts = {m: backtest(logh, seed, m) for m in METHODS}
+    main = min(bts, key=lambda m: bts[m]["summary"]["mae_pct"]["median"])
+    other = next(m for m in METHODS if m != main)
+    paths = simulate(logh, origin, str(METHODS[main](origin).date()), fc["horizon_days"], fc["n_paths"], seed)
+    recent = simulate(logh, origin, str(METHODS[other](origin).date()), fc["horizon_days"], fc["n_paths"], seed + 1)
     days = pd.date_range(origin, periods=fc["horizon_days"] + 1, freq="D")
     d = pd.read_parquet(PROCESSED / "days.parquet")
     d = d[d.index <= origin]
@@ -91,7 +99,9 @@ def run() -> dict:
     H = np.exp(paths)
     out = {"origin": str(origin.date()), "height_at_origin": height0, "price_usd_last30": price0,
            "fee_share_last30": fee0, "n_paths": fc["n_paths"],
-           "growth_resampling": f"30-day blocks of daily log-growth since {fc['growth_window_start']}",
+           "growth_resampling": f"30-day blocks of daily log-growth, window '{main}' (lower backtest error than "
+                                f"'{other}', which is shown as a sensitivity line)",
+           "main_method": main, "sensitivity_method": other,
            "halving": {"height": fc["halving_height"],
                        "date_p10": str(pd.Series(halving_dates).quantile(0.1).date()),
                        "date_p50": str(pd.Series(halving_dates).quantile(0.5).date()),
@@ -99,7 +109,7 @@ def run() -> dict:
     monthly = np.arange(0, fc["horizon_days"] + 1, 30)
     out["hashrate_eh"] = [{"date": str(days[i].date()),
                            **{f"p{q}": float(np.percentile(H[:, i], q) / 1e6) for q in (10, 25, 50, 75, 90)},
-                           "recent_p50": float(np.percentile(np.exp(recent[:, i]), 50) / 1e6)} for i in monthly]
+                           "sensitivity_p50": float(np.percentile(np.exp(recent[:, i]), 50) / 1e6)} for i in monthly]
     # hash price under price x fee scenarios (USD per TH/s per day), median path
     scen = []
     for pm in (0.5, 1.0, 2.0):
@@ -138,7 +148,8 @@ def run() -> dict:
                          "breakeven_usd_kwh_p90": float(np.percentile(be, 90)),
                          "solo_p_year_p50": float(np.percentile(p_solo, 50))})
     out["devices"] = devs
-    out["backtest"] = backtest(logh, seed)
+    out["backtest"] = bts[main]
+    out["backtest_comparison"] = {m: b["summary"] for m, b in bts.items()}
     out["scope_statement"] = ("Scenario projections conditional on resampled historical growth, a fixed price "
                               "multiplier and a fixed fee share. They are not price forecasts and not investment "
                               "advice; the backtest shows the size of the error to expect.")

@@ -31,7 +31,8 @@ export default function Future() {
     const hist = data.timeline.filter((r) => r.h && r.w >= "2021-01-01").map((r) => [r.w, r.h]);
     const he = F.hashrate_eh as Dict[];
     const fanOpt = {
-      tooltip: tooltip({ valueFormatter: (v: number) => `${fmt(v, 0)} EH/s` }), legend: legend({ top: 0 }),
+      tooltip: tooltip({ valueFormatter: (v: number) => `${fmt(v, 0)} EH/s` }),
+      legend: legend({ top: 0, data: ["observed", "10–90% of paths", "median path", `median (${F.sensitivity_method} window)`] }),
       grid: { left: 54, right: 16, top: 36, bottom: 30 },
       xAxis: { type: "time", ...axis() }, yAxis: { type: "value", name: "EH/s", ...axis() },
       series: [
@@ -40,7 +41,7 @@ export default function Future() {
         { name: "10–90% of paths", type: "line", showSymbol: false, stack: "band", data: he.map((r) => [r.date, r.p90 - r.p10]), lineStyle: { opacity: 0 }, areaStyle: { color: "rgba(167,139,250,0.20)" } },
         { name: "median path", type: "line", showSymbol: false, data: he.map((r) => [r.date, r.p50]), lineStyle: glowLine(C.violet, 2.4),
           markLine: { symbol: "none", data: [{ xAxis: F.halving.date_p50 }], lineStyle: { color: C.btc, type: "dashed", width: 2 }, label: { formatter: "2028 halving (median)", color: C.btc } } },
-        { name: "median (last-3-years growth)", type: "line", showSymbol: false, data: he.map((r) => [r.date, r.recent_p50]), lineStyle: { color: C.magenta, type: "dashed", width: 1.6 } },
+        { name: `median (${F.sensitivity_method} window)`, type: "line", showSymbol: false, data: he.map((r) => [r.date, r.sensitivity_p50]), lineStyle: { color: C.magenta, type: "dashed", width: 1.6 } },
       ],
     };
     const cl = F.client;
@@ -51,7 +52,7 @@ export default function Future() {
     const be = (arr: number[]) => arr.map((v) => (v * d.ths * 0.98) / ((d.watts / 1000) * 24));
     const hpOpt = {
       tooltip: tooltip({ valueFormatter: (v: number) => usd(v, 4) }), legend: legend({ top: 0 }),
-      grid: { left: 64, right: 16, top: 36, bottom: 30 },
+      grid: { left: 64, right: 16, top: 58, bottom: 30 },
       xAxis: { type: "category", data: months, ...axis({ axisLabel: { color: C.muted, formatter: (v: string) => v.slice(0, 7) } }) },
       yAxis: { type: "value", name: "USD per TH/s per day", ...axis() },
       series: [
@@ -62,7 +63,7 @@ export default function Future() {
     };
     const beOpt = {
       tooltip: tooltip({ valueFormatter: (v: number) => `${usd(v, 3)}/kWh` }), legend: legend({ top: 0 }),
-      grid: { left: 60, right: 16, top: 36, bottom: 30 },
+      grid: { left: 60, right: 16, top: 58, bottom: 30 },
       xAxis: { type: "category", data: months, ...axis({ axisLabel: { color: C.muted, formatter: (v: string) => v.slice(0, 7) } }) },
       yAxis: { type: "value", name: "break-even USD/kWh", ...axis() },
       series: [

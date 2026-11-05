@@ -17,6 +17,13 @@ def _r(x, n=4):
     return None if x is None or (isinstance(x, float) and not np.isfinite(x)) else round(float(x), n)
 
 
+def _sig(x, n=4):
+    """Round to n significant digits (hash rate spans 20 orders of magnitude)."""
+    if x is None or not np.isfinite(x) or x == 0:
+        return None if x is None or not np.isfinite(x) else 0.0
+    return float(f"{x:.{n}g}")
+
+
 def timeline() -> list:
     d = pd.read_parquet(PROCESSED / "days.parquet")
     d = d[d.index <= pd.Timestamp(cfg()["sources"]["last_day"], tz="UTC")]
@@ -30,9 +37,9 @@ def timeline() -> list:
     w = w.join(wk[["kmeans", "hier_ward", "dbscan"]], how="left")
     rows = []
     for t, r in w.iterrows():
-        rows.append({"w": str(t.date()), "h": _r(r["hashrate_ths"] / 1e6, 9), "p": _r(r["price_usd"], 2),
-                     "hp": _r(r["hashprice_usd_th_day"], 6), "be": _r(r["breakeven_usd_kwh"], 5),
-                     "sp": _r(r["solo_p_year_bitaxe"], 9), "nk": _r(r["nakamoto"], 2), "t1": _r(r["top1_share"]),
+        rows.append({"w": str(t.date()), "h": _sig(r["hashrate_ths"] / 1e6), "p": _r(r["price_usd"], 2),
+                     "hp": _sig(r["hashprice_usd_th_day"]), "be": _sig(r["breakeven_usd_kwh"]),
+                     "sp": _sig(r["solo_p_year_bitaxe"]), "nk": _r(r["nakamoto"], 2), "t1": _r(r["top1_share"]),
                      "fs": _r(r["fee_share"]), "es": _r(r["empty_share"]), "us": _r(r["unknown_share"]),
                      "fr": _r(r["frontier_j_per_th"], 2), "hw": r["frontier_name"], "era": r["era"],
                      "km": None if pd.isna(r["kmeans"]) else int(r["kmeans"]),
@@ -71,9 +78,8 @@ def tree_and_examples() -> dict:
     f = f.merge(pred[["id", "y", "pred", "solo_score"]], on="id", how="left")
     test = f[f["id"].isin(pred["id"])]
     seed = cfg()["project"]["random_seed"]
-    picks = pd.concat([test[test["is_solo"]],
-                       test[~test["is_solo"]].groupby("miner", group_keys=False)
-                       .apply(lambda g: g.sample(min(len(g), 12), random_state=seed))])
+    picks = pd.concat([test[test["is_solo"]]] +
+                      [g.sample(min(len(g), 12), random_state=seed) for _, g in test[~test["is_solo"]].groupby("miner")])
     stats = f[feats].describe(percentiles=[0.01, 0.5, 0.99]).T
     return {"tree": ex["tree_export"], "features": feats,
             "feature_ranges": {k: {"min": _r(stats.loc[k, "1%"]), "max": _r(stats.loc[k, "99%"]),
@@ -131,6 +137,7 @@ def run() -> None:
                      "nakamoto_family": dec["unknown_attribution"]["nakamoto_after_family_merge"],
                      "macro_f1_test": tm["families"][tm["operational_family"]]["macro_f1"],
                      "macro_f1_ci": tm["bootstrap"]["macro_f1_95ci"], "operational_family": tm["operational_family"],
+                     "top3": tm["families"][tm["operational_family"]].get("top3_accuracy"), "n_classes": len(sel["classes"]),
                      "halving_p50": fu["halving"]["date_p50"], "breakeven_s21": s21["breakeven_usd_kwh"],
                      "era_ari": cl["ari_vs_hardware_eras"]["kmeans"], "rules": ru["n_rules"]},
         "sources": [
