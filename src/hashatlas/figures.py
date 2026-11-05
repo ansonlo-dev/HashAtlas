@@ -26,7 +26,22 @@ HALVINGS = ["2012-11-28", "2016-07-09", "2020-05-11", "2024-04-20"]
 NEON = LinearSegmentedColormap.from_list("neon", ["#FFFFFF", "#C4B5FD", VIOLET, "#4C1D95"])
 
 
-def style():
+OUT = FIGURES
+FACE = "white"
+
+
+def style(dark: bool = False):
+    """Light style for the printed report; dark style (same palette) for the slide deck."""
+    global INK, MUTED, GRID, OUT, FACE
+    if dark:
+        INK, MUTED, GRID, FACE = "#EAF0FF", "#9AA3C7", "#1F2547", "#070A1A"
+        OUT = FIGURES / "dark"
+    else:
+        INK, MUTED, GRID, FACE = "#0B1530", "#5B6478", "#E3E7EF", "white"
+        OUT = FIGURES
+    OUT.mkdir(parents=True, exist_ok=True)
+    plt.rcParams.update({"figure.facecolor": FACE, "axes.facecolor": FACE, "text.color": INK, "savefig.facecolor": FACE,
+                         "legend.labelcolor": INK})
     plt.rcParams.update({
         "figure.dpi": 150, "savefig.dpi": 200, "font.size": 9.5, "font.family": "DejaVu Sans",
         "axes.edgecolor": MUTED, "axes.labelcolor": INK, "axes.titlecolor": INK, "axes.titleweight": "bold",
@@ -37,7 +52,7 @@ def style():
 
 def save(fig, name: str):
     fig.tight_layout()
-    fig.savefig(FIGURES / f"{name}.png", bbox_inches="tight", facecolor="white")
+    fig.savefig(OUT / f"{name}.png", bbox_inches="tight", facecolor=FACE)
     plt.close(fig)
 
 
@@ -186,14 +201,15 @@ def fig_confusion():
     m = np.array(t["confusion"]["matrix"], dtype=float)
     r = m / m.sum(axis=1, keepdims=True).clip(min=1)
     fig, ax = plt.subplots(figsize=(6.8, 5.6))
-    im = ax.imshow(r, cmap=NEON, vmin=0, vmax=1)
+    cmap = NEON if FACE == "white" else LinearSegmentedColormap.from_list("neond", ["#0B1030", "#3B1D7A", VIOLET, PINK, BTC])
+    im = ax.imshow(r, cmap=cmap, vmin=0, vmax=1)
     ax.set_xticks(range(len(labels)), labels, rotation=55, ha="right", fontsize=7.5)
     ax.set_yticks(range(len(labels)), labels, fontsize=7.5)
     for i in range(len(labels)):
         for j in range(len(labels)):
             if r[i, j] >= 0.05:
                 ax.text(j, i, f"{r[i, j]:.2f}", ha="center", va="center", fontsize=6.5,
-                        color="white" if r[i, j] > 0.5 else INK)
+                        color="white" if (r[i, j] > 0.5 or FACE != "white") else INK)
     ax.set_xlabel("predicted")
     ax.set_ylabel("true (row-normalised = recall)")
     ax.set_title("Who looks like whom: test-period confusion matrix")
@@ -234,10 +250,15 @@ def fig_tree():
     from sklearn.tree import plot_tree
     sel = read_json(ARTIFACTS / "model_selection.json")
     tree = joblib.load(MODELS / "final_tree.joblib")
-    fig, ax = plt.subplots(figsize=(13, 5.6))
-    plot_tree(tree, max_depth=2, feature_names=sel["features"], class_names=list(tree.classes_), filled=False,
-              impurity=True, proportion=True, fontsize=7, ax=ax, precision=2)
-    ax.set_title("Top three levels of the fitted decision tree (proportions per node)")
+    fig, ax = plt.subplots(figsize=(12, 5.2))
+    plot_tree(tree, max_depth=1, feature_names=sel["features"], class_names=list(tree.classes_), filled=False,
+              impurity=True, proportion=True, fontsize=10, ax=ax, precision=2)
+    for t in ax.texts:
+        t.set_color(INK)
+        if t.get_bbox_patch():
+            t.get_bbox_patch().set_facecolor(FACE)
+            t.get_bbox_patch().set_edgecolor(MUTED)
+    ax.set_title("Top two levels of the fitted decision tree (proportions per node)")
     save(fig, "f11_tree_top")
 
 
@@ -262,14 +283,19 @@ def fig_clusters():
     w = pd.read_parquet(PROCESSED / "weeks.parquet")
     tcol = w.columns[0]
     fig, ax = plt.subplots(figsize=(9, 2.9))
+    CL = ["#F472B6", "#2DD4BF", "#60A5FA", "#FDE047", "#C084FC", "#FB7185"]   # never the era colours
     rows = [("hardware era", w["era"].map({e: i for i, e in enumerate(ERA_COL)}), list(ERA_COL.values())),
-            ("K-means", w["kmeans"], CYCLE), ("Ward", w["hier_ward"] - 1, CYCLE), ("DBSCAN", w["dbscan"], CYCLE)]
+            ("K-means", w["kmeans"], CL), ("Ward", w["hier_ward"] - 1, CL), ("DBSCAN", w["dbscan"], CL)]
     for i, (name, lab, cols) in enumerate(rows):
-        c = ["#111827" if v < 0 else cols[int(v) % len(cols)] for v in lab]
+        c = [(INK if FACE != "white" else "#111827") if v < 0 else cols[int(v) % len(cols)] for v in lab]
         ax.scatter(w[tcol], np.full(len(w), i), c=c, marker="|", s=260, lw=2.2)
     ax.set_yticks(range(len(rows)), [r[0] for r in rows])
     ax.set_ylim(-0.6, len(rows) - 0.4)
-    ax.set_title(f"Unsupervised eras vs hardware eras (ARI K-means = {cl['ari_vs_hardware_eras']['kmeans']:.2f}; black = DBSCAN noise)")
+    ax.set_title(f"Unsupervised eras vs hardware eras (ARI K-means {cl['ari_vs_hardware_eras']['kmeans']:.2f}, "
+                 f"Ward {cl['hierarchical']['ward']['ari_vs_hardware_eras']:.2f}; {'black' if FACE == 'white' else 'white'} = DBSCAN noise)")
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(color=v, label=k) for k, v in ERA_COL.items()], loc="upper center",
+              bbox_to_anchor=(0.5, -0.12), ncol=5, fontsize=8)
     ax.grid(False)
     save(fig, "f13_eras_timeline")
     pf = cl["pool_families"]
@@ -324,7 +350,7 @@ def fig_future():
     ax[0].fill_between(h["date"], h["p10"], h["p90"], color=VIOLET, alpha=0.18, label="10-90% of paths")
     ax[0].fill_between(h["date"], h["p25"], h["p75"], color=VIOLET, alpha=0.30)
     ax[0].plot(h["date"], h["p50"], color=VIOLET, lw=1.6, label="median path")
-    ax[0].plot(h["date"], h["recent_p50"], color=PINK, ls="--", lw=1.2, label="median (last-3-years growth)")
+    ax[0].plot(h["date"], h["sensitivity_p50"], color=PINK, ls="--", lw=1.2, label="median (sensitivity window)")
     hv = pd.Timestamp(fu["halving"]["date_p50"])
     ax[0].axvline(hv, color=BTC, ls=":")
     ax[0].text(hv, ax[0].get_ylim()[1] * 0.95, " 2028 halving (median)", color=BTC, fontsize=7.5, va="top")
@@ -361,11 +387,15 @@ def fig_concentration(d):
 
 
 def run() -> None:
-    style()
-    FIGURES.mkdir(parents=True, exist_ok=True)
+    for dark in (False, True):
+        style(dark)
+        _all()
+    print("figures:", len(list(FIGURES.glob("*.png"))), "+ dark:", len(list((FIGURES / "dark").glob("*.png"))))
+
+
+def _all() -> None:
     d = days()
     for f in (lambda: fig_hashrate(d), fig_who_mines, lambda: fig_solo(d), fig_quality, fig_selection,
               fig_complexity, fig_models, fig_confusion, fig_curves, fig_importance, fig_tree, fig_clusters,
               fig_rules, fig_advisor, fig_future, lambda: fig_concentration(d)):
         f()
-    print("figures:", len(list(FIGURES.glob("*.png"))))

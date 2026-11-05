@@ -15,7 +15,7 @@ from sklearn.metrics import (average_precision_score, classification_report, con
                              precision_recall_curve, roc_auc_score, roc_curve)
 
 from .config import ARTIFACTS, MODELS, cfg, read_json, write_json
-from .train import families, load_sets, macro_scores, sample_train
+from .train import families, family_scores, load_sets, macro_scores, sample_train, topk_accuracy
 
 
 def _scores(model, X) -> np.ndarray:
@@ -89,7 +89,8 @@ def run() -> dict:
         preds[name] = p
         s = _scores(est, Xt)
         ysolo = (yt == "Solo").to_numpy()
-        out[name] = {**macro_scores(yt, p),
+        out[name] = {**macro_scores(yt, p), **family_scores(yt, p, sel["template_families"]["map"]),
+                     "top3_accuracy": topk_accuracy(est, Xt, yt),
                      "solo_roc_auc": float(roc_auc_score(ysolo, s)) if ysolo.any() else None,
                      "solo_average_precision": float(average_precision_score(ysolo, s)) if ysolo.any() else None,
                      "solo_base_rate": float(ysolo.mean()),
@@ -99,13 +100,18 @@ def run() -> dict:
               f"solo AP {out[name]['solo_average_precision']:.3f}", flush=True)
     for b in ("majority", "stratified_random", "decision_stump"):
         m = joblib.load(MODELS / f"{b}_train.joblib")
-        out[b] = {**macro_scores(yt, m.predict(Xt)), "baseline": True}
+        pb = m.predict(Xt)
+        out[b] = {**macro_scores(yt, pb), **family_scores(yt, pb, sel["template_families"]["map"]), "baseline": True}
 
     chosen = sel["chosen_family"]
     p = preds[chosen]
     labels = cmap["classes"]
     cm = confusion_matrix(yt, p, labels=labels)
     rep = classification_report(yt, p, labels=labels, output_dict=True, zero_division=0)
+    fam_map = sel["template_families"]["map"]
+    fam_labels = sorted(set(fam_map.get(x, x) for x in labels))
+    cm_fam = confusion_matrix(yt.map(lambda x: fam_map.get(x, x)), pd.Series(p).map(lambda x: fam_map.get(x, x)),
+                              labels=fam_labels)
     # Solo operating threshold (frozen on validation) applied to the operational tree's Solo probability
     tree = joblib.load(MODELS / "final_tree.joblib")
     ps = _scores(tree, Xt)
@@ -134,6 +140,7 @@ def run() -> dict:
         "operational_family": chosen, "test_blocks": len(te), "test_period": c["classification"]["test"],
         "families": out, "per_class": {k: rep[k] for k in labels},
         "confusion": {"labels": labels, "matrix": cm.tolist()},
+        "family_confusion": {"labels": fam_labels, "matrix": cm_fam.tolist()},
         "bootstrap": bootstrap(te, p, c["bootstrap"]["n_resamples"] if "bootstrap" in c else 500, seed),
         "solo_operating_point": solo_op, "monthly": monthly.to_dict(orient="records"),
         "newcomer_pools": newcomers, "curves": curves,

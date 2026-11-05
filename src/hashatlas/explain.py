@@ -119,7 +119,7 @@ def run() -> dict:
                              "path": trace(tree, row[feats].astype(float), feats)})
     out["traces"] = examples
     # Permutation importance (test period, operational tree), on a stratified sample for cost
-    samp = te.groupby("y", group_keys=False).apply(lambda g: g.sample(min(len(g), 3000), random_state=seed))
+    samp = pd.concat([g.sample(min(len(g), 3000), random_state=seed) for _, g in te.groupby("y")])
     pi = permutation_importance(tree, samp[feats].astype(float), samp["y"], scoring="f1_macro", n_repeats=5,
                                 random_state=seed, n_jobs=-1)
     imp = pd.DataFrame({"feature": feats, "mean": pi.importances_mean, "sd": pi.importances_std})
