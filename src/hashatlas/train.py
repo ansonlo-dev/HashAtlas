@@ -19,6 +19,7 @@ import pandas as pd
 from scipy.stats import spearmanr
 from sklearn.dummy import DummyClassifier
 from sklearn.feature_selection import mutual_info_classif
+from scipy.cluster.hierarchy import fcluster, linkage
 from sklearn.metrics import balanced_accuracy_score, f1_score
 from sklearn.model_selection import GridSearchCV, GroupKFold, cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
@@ -40,6 +41,7 @@ GROUPS = {
     "body composition": ["log_tx_count", "is_empty", "fullness", "witness_tx_share", "witness_byte_share",
                          "io_ratio", "avg_tx_vbytes", "log_fee_total", "log_fee_per_kwu", "fee_share", "log_min_fee"],
     "day-relative policy": ["rel_fee_rate", "rel_min_fee", "rel_median_fee", "rel_tx_count", "rel_fullness"],
+    "fee ladder (percentiles)": ["rel_fee_p10", "rel_fee_p25", "rel_fee_p75", "rel_fee_p90", "fee_spread"],
     "hour of day (control)": ["hour_sin", "hour_cos"],
 }
 
@@ -156,7 +158,7 @@ def families(seed: int) -> dict:
         "tree": (DecisionTreeClassifier(random_state=seed),
                  {"criterion": c["tree"]["criterion"], "max_depth": c["tree"]["max_depth"],
                   "min_samples_leaf": c["tree"]["min_samples_leaf"], "class_weight": c["tree"]["class_weight"]}),
-        "knn": (scaled(KNeighborsClassifier(n_jobs=1)),
+        "knn": (scaled(KNeighborsClassifier(algorithm="brute", n_jobs=1)),
                 {"model__n_neighbors": c["knn"]["n_neighbors"], "model__weights": c["knn"]["weights"],
                  "model__metric": c["knn"]["metric"]}),
         "svm_linear": (scaled(LinearSVC(class_weight="balanced", dual=False, max_iter=5000, random_state=seed)),
@@ -167,10 +169,55 @@ def families(seed: int) -> dict:
 
 
 def macro_scores(y_true, y_pred) -> dict:
-    return {"macro_f1": float(f1_score(y_true, y_pred, average="macro")),
+    """Macro-F1 over the classes that actually occur in y_true. Predicting a pool that no longer exists is still
+    an error (a false negative for the true class), but an absent class does not add an artificial zero."""
+    present = sorted(set(np.asarray(y_true)))
+    return {"macro_f1": float(f1_score(y_true, y_pred, average="macro", labels=present)),
             "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
             "accuracy": float(np.mean(np.asarray(y_true) == np.asarray(y_pred))),
             "solo_f1": float(f1_score(np.asarray(y_true) == "Solo", np.asarray(y_pred) == "Solo", zero_division=0))}
+
+
+def template_families(tr: pd.DataFrame, feats: list[str]) -> dict:
+    """Group the classes whose *training-period* fingerprint profiles are nearly identical (average linkage on
+    standardised class means; cut at the 35th percentile of merge heights). Frozen before validation/testing and
+    used to report family-level accuracy: two pools building blocks from the same template cannot be told apart."""
+    prof = tr.groupby("y")[feats].mean()
+    Z = ((prof - prof.mean()) / prof.std(ddof=0).replace(0, 1)).to_numpy()
+    L = linkage(Z, method="average")
+    cut = float(np.quantile(L[:, 2], 0.35))
+    lab = fcluster(L, cut, criterion="distance")
+    groups: dict[int, list[str]] = {}
+    for cls, g in zip(prof.index, lab):
+        groups.setdefault(int(g), []).append(cls)
+    fam = {}
+    for members in groups.values():
+        name = members[0] if len(members) == 1 else "Family: " + " + ".join(sorted(members))
+        for m in members:
+            fam[m] = name
+    return {"map": fam, "cut_height": cut, "groups": sorted(groups.values(), key=len, reverse=True),
+            "merge_heights": L[:, 2].round(4).tolist()}
+
+
+def topk_accuracy(model, X, y, k: int = 3) -> float | None:
+    if hasattr(model, "predict_proba"):
+        try:
+            s = model.predict_proba(X)
+        except AttributeError:
+            s = model.decision_function(X)
+    else:
+        s = model.decision_function(X)
+    if s.ndim != 2:
+        return None
+    top = np.asarray(model.classes_)[np.argsort(-s, axis=1)[:, :k]]
+    return float(np.mean([t in row for t, row in zip(np.asarray(y), top)]))
+
+
+def family_scores(y_true, y_pred, fam: dict) -> dict:
+    yt = pd.Series(np.asarray(y_true)).map(lambda c: fam.get(c, c))
+    yp = pd.Series(np.asarray(y_pred)).map(lambda c: fam.get(c, c))
+    s = macro_scores(yt, yp)
+    return {"family_macro_f1": s["macro_f1"], "family_accuracy": s["accuracy"]}
 
 
 def run() -> dict:
@@ -220,7 +267,7 @@ def run() -> dict:
             "cv_macro_f1_mean": float(cvres.loc[best, "mean_test_score"]),
             "cv_macro_f1_se": float(cvres.loc[best, "std_test_score"] / np.sqrt(c["cv_folds"])),
             "cv_train_macro_f1": float(cvres.loc[best, "mean_train_score"]),
-            "validation": macro_scores(yv, pred_v),
+            "validation": {**macro_scores(yv, pred_v), "top3_accuracy": topk_accuracy(gsv.best_estimator_, Xv, yv)},
             "search_seconds": round(time.time() - t0, 1), "configs": len(cvres),
             "grid": [{"params": p, "cv": float(m), "train": float(t)} for p, m, t in
                      zip(cvres["params"], cvres["mean_test_score"], cvres["mean_train_score"])],
@@ -229,12 +276,16 @@ def run() -> dict:
         print(f"{name}: cv {results[name]['cv_macro_f1_mean']:.3f} val {results[name]['validation']['macro_f1']:.3f} "
               f"({results[name]['search_seconds']}s)", flush=True)
 
+    fams = template_families(tr, feats)
+    for name in results:
+        results[name]["validation"].update(family_scores(yv, fitted[name].predict(Xv), fams["map"]))
     # Baselines
     for bname, est in (("majority", DummyClassifier(strategy="most_frequent")),
                        ("stratified_random", DummyClassifier(strategy="stratified", random_state=seed)),
                        ("decision_stump", DecisionTreeClassifier(max_depth=1, random_state=seed))):
         est.fit(X, y)
-        results[bname] = {"validation": macro_scores(yv, est.predict(Xv)), "baseline": True}
+        pv = est.predict(Xv)
+        results[bname] = {"validation": {**macro_scores(yv, pv), **family_scores(yv, pv, fams["map"])}, "baseline": True}
         fitted[bname] = est
 
     # Nested CV (outer 5 x inner 3, month groups) for the tree: an unbiased estimate of the *tuning procedure*
@@ -244,8 +295,7 @@ def run() -> dict:
     outer_scores = []
     for k, (a, b) in enumerate(GroupKFold(c["nested_outer_folds"]).split(X, y, groups)):
         inner.fit(X.iloc[a], y.iloc[a], groups=groups.iloc[a])
-        outer_scores.append({"fold": k, "macro_f1": float(f1_score(y.iloc[b], inner.predict(X.iloc[b]),
-                                                                    average="macro")),
+        outer_scores.append({"fold": k, "macro_f1": macro_scores(y.iloc[b], inner.predict(X.iloc[b]))["macro_f1"],
                              "chosen": inner.best_params_})
     nested = {"outer": outer_scores, "mean": float(np.mean([o["macro_f1"] for o in outer_scores])),
               "sd": float(np.std([o["macro_f1"] for o in outer_scores], ddof=1)), "seconds": round(time.time() - t0, 1)}
@@ -270,7 +320,7 @@ def run() -> dict:
     selection = {
         "rule": "highest validation macro-F1; the decision tree is preferred if within 0.01 (interpretability)",
         "chosen_family": chosen, "best_by_score": best, "chosen_params": results[chosen]["best_params"],
-        "features": feats, "classes": cmap["classes"],
+        "features": feats, "classes": cmap["classes"], "template_families": fams,
         "solo_threshold": {"value": best_t, "validation_recall": best_r,
                            "rule": f"highest recall with precision >= {c['min_precision_for_threshold']} on validation"},
         "final_refit": "chosen configuration refitted on train-sample + validation before the sealed test",
