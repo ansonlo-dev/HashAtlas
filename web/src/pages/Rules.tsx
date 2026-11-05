@@ -83,6 +83,24 @@ export default function Rules() {
           </table>
           <p className="caption">Verified against exhaustive enumeration of every itemset (up to size {bf.max_len}) over the first {bf.items_checked} items: {bf.missing_from_apriori} missing, {bf.wrong_counts} wrong counts.</p>
         </Panel>
+        <Panel title="Pool signatures (contrast mining)" sub="For each pool, Apriori runs inside its own blocks (min support 30%); itemsets are ranked by how much more often they appear there than in all other blocks.">
+          <div className="table-wrap" style={{ maxHeight: 330 }}>
+            <table className="data">
+              <thead><tr><th>pool</th><th>signature itemset</th><th>inside</th><th>elsewhere</th><th>ratio</th></tr></thead>
+              <tbody>{(R.pool_signatures as Dict[]).map((p) => {
+                const t = (p.top as Dict[])[0];
+                return (
+                  <tr key={p.pool}><td className="txt">{p.pool}</td><td className="txt">{t ? t.itemset.join(" ∧ ") : "no distinctive itemset"}</td>
+                    <td>{t ? pct(t.support_inside, 0) : "–"}</td><td>{t ? pct(t.support_outside, 1) : "–"}</td>
+                    <td className={t && t.ratio > 3 ? "ok" : ""}>{t ? `${fmt(t.ratio, 1)}×` : "–"}</td></tr>
+                );
+              })}</tbody>
+            </table>
+          </div>
+          <p className="caption">Pools with no distinctive itemset build blocks the way most others do — the reason pool-level fingerprinting has a ceiling.</p>
+        </Panel>
+      </div>
+      <div className="grid mt">
         <Panel title="What makes a solo block different?" sub={`Solo blocks are too rare (${sc.solo_blocks} since 2019) for global support thresholds, so we mine frequent itemsets inside solo blocks and compare with ${int(sc.pool_blocks)} pool blocks.`}>
           <div className="table-wrap" style={{ maxHeight: 330 }}>
             <table className="data">

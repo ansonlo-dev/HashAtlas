@@ -1,0 +1,145 @@
+{
+ "passed": 17,
+ "total": 17,
+ "checks": [
+  {
+   "check": "test macro-F1 from saved predictions",
+   "published": 0.24384788980303465,
+   "recomputed": 0.24384788980303465,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "test accuracy from saved predictions",
+   "published": 0.4240708983414681,
+   "recomputed": 0.4240708983414681,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "confusion matrix sums to test blocks",
+   "published": 83387,
+   "recomputed": 83387,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "no label-source / time features in model",
+   "published": "none",
+   "recomputed": [],
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "train < validation < test < new (no overlap)",
+   "published": "ordered",
+   "recomputed": [
+    [
+     "2019-01-01",
+     "2024-01-01"
+    ],
+    [
+     "2024-01-01",
+     "2025-04-01"
+    ],
+    [
+     "2025-04-01",
+     "2026-11-01"
+    ],
+    [
+     "2026-11-01",
+     "2026-11-12"
+    ]
+   ],
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "model choice frozen before test evaluation",
+   "published": "2026-11-13 03:39:30",
+   "recomputed": "selection older than test metrics",
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "root split Gini reduction",
+   "published": 0.08023393841207305,
+   "recomputed": 0.08023393841207305,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "exported tree (web simulator) == fitted tree",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "transactions count",
+   "published": 120538,
+   "recomputed": 120538,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "Apriori brute-force check (stage) passed",
+   "published": true,
+   "recomputed": true,
+   "passed": true,
+   "note": "20 frequent itemsets of size <= 2 among the first 10 items here"
+  },
+  {
+   "check": "top rule confidence",
+   "published": 0.6470801595937613,
+   "recomputed": 0.6470801595937613,
+   "passed": true,
+   "note": "fullness=full(>=98%) & version=signal bits set"
+  },
+  {
+   "check": "hash price (USD/TH/day) on freeze day",
+   "published": 0.033088904147887004,
+   "recomputed": 0.033088904147887004,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "subsidy follows 50 BTC / 2^(height // 210000)",
+   "published": "0 over-claims",
+   "recomputed": {
+    "mismatches": 1124,
+    "over_claims": 0
+   },
+   "passed": true,
+   "note": "consensus forbids over-claiming; 1124 blocks under-claimed their reward (allowed, mostly 2011-2013 pool software)"
+  },
+  {
+   "check": "solo P(block in a year), Bitaxe",
+   "published": 6.111819476084523e-05,
+   "recomputed": 6.111819476084523e-05,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "tag labeller precision >= 99% when a tag is found",
+   "published": ">= 0.99",
+   "recomputed": 0.9995346270531721,
+   "passed": true,
+   "note": "424464 blocks vs mempool.space; coverage 0.926, overall agreement 0.942 (address-only pools are left Unknown by design)"
+  },
+  {
+   "check": "no missing or duplicate heights",
+   "published": 0,
+   "recomputed": 0,
+   "passed": true,
+   "note": ""
+  },
+  {
+   "check": "web models.json matches test metrics",
+   "published": 0.24384788980303465,
+   "recomputed": 0.24384788980303465,
+   "passed": true,
+   "note": ""
+  }
+ ]
+}

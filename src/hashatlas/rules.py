@@ -28,16 +28,24 @@ def items_frame(f: pd.DataFrame, edges: dict | None = None) -> tuple[pd.DataFram
         edges = {"ts_q90": float(f["ts_minus_median_s"].quantile(0.90)),
                  "wit_q75": float(f["witness_byte_share"].quantile(0.75)),
                  "io_q25": float(f["io_ratio"].quantile(0.25)), "io_q75": float(f["io_ratio"].quantile(0.75))}
-    cm = read_json(ARTIFACTS / "class_map.json")
-    big = set(cm["big_pools"])
+    # miner item = the actual pool for pools with >= 1% of the discovery window, otherwise "small pools"
+    if "pools" not in edges:
+        share = f.loc[f["miner"] != "Unknown", "miner"].value_counts(normalize=True)
+        edges["pools"] = sorted(m for m, v in share.items() if v >= 0.01 and m not in SOLO_POOLS)
+    big = set(edges["pools"])
     miner = f["miner"].map(lambda m: "Solo" if m in SOLO_POOLS else ("Unknown" if m == "Unknown" else
-                                                                       (m if m in big else "Other pools")))
+                                                                       (m if m in big else "small pools")))
     I = pd.DataFrame(index=f.index)
     I["block=empty"] = f["is_empty"] == 1
     I["fullness=full(>=98%)"] = f["fullness"] >= 0.98
     I["fullness=light(<50%)"] = (f["fullness"] < 0.5) & (f["is_empty"] == 0)
-    I["version=rolling"] = f["ver_rolled"] == 1
     I["version=no-rolling"] = f["ver_rolled"] == 0
+    pc = f["ver_roll_popcount"]
+    I["version=rolls 1-4 bits"] = pc.between(1, 4)
+    I["version=rolls 5-8 bits"] = pc.between(5, 8)
+    I["version=rolls 9-12 bits"] = pc.between(9, 12)
+    I["version=rolls 13-16 bits"] = pc >= 13
+    I["version=signal bits set"] = f["ver_signal_bits"] > 0
     I["time=far-ahead-of-median"] = f["ts_minus_median_s"] > edges["ts_q90"]
     I["interval=fast(<60s)"] = f["interval_prev_s"] < 60
     I["interval=slow(>30min)"] = f["interval_prev_s"] > 1800
@@ -134,6 +142,21 @@ def confirm(rules: list, I2: pd.DataFrame) -> list:
     return rules
 
 
+def contrast(Mfeat: np.ndarray, names: list[str], inside: np.ndarray, outside: np.ndarray, min_share: float,
+             max_len: int = 3) -> list[dict]:
+    """Frequent itemsets inside one group (Apriori on that group's blocks) compared with their support outside."""
+    Mi, Mo = Mfeat[inside], Mfeat[outside]
+    sup, _ = apriori(Mi, names, max(5, int(np.ceil(min_share * len(Mi)))), max_len)
+    out = []
+    for iset, cnt in sup.items():
+        so = float(np.logical_and.reduce(Mo[:, list(iset)], axis=1).mean())
+        si = cnt / len(Mi)
+        out.append({"itemset": [names[x] for x in iset], "support_inside": si, "support_outside": so,
+                    "ratio": si / so if so > 0 else None, "blocks": int(cnt)})
+    out.sort(key=lambda r: -(r["ratio"] if r["ratio"] is not None else 1e9))
+    return out
+
+
 def run() -> dict:
     c = cfg()["association"]
     f = pd.read_parquet(PROCESSED / "block_features.parquet")
@@ -159,13 +182,22 @@ def run() -> dict:
     Ms = Is[feat_cols].to_numpy()[solo_mask]
     sup_s, _ = apriori(Ms, feat_cols, max(5, int(0.25 * len(Ms))), 3)
     Mp = Is[feat_cols].to_numpy()[pool_mask]
-    contrast = []
+    contrast_solo = []
     for iset, cnt in sup_s.items():
         sp = float(np.logical_and.reduce(Mp[:, list(iset)], axis=1).mean())
         ss = cnt / len(Ms)
-        contrast.append({"itemset": [feat_cols[x] for x in iset], "support_in_solo": ss, "support_in_pools": sp,
-                         "ratio": ss / sp if sp > 0 else None, "solo_blocks": int(cnt)})
-    contrast.sort(key=lambda r: -(r["ratio"] or 0))
+        contrast_solo.append({"itemset": [feat_cols[x] for x in iset], "support_in_solo": ss, "support_in_pools": sp,
+                              "ratio": ss / sp if sp > 0 else None, "solo_blocks": int(cnt)})
+    contrast_solo.sort(key=lambda r: -(r["ratio"] or 0))
+    # Pool signatures: for every pool with >= 1% of discovery blocks, its most over-represented frequent itemsets
+    Md = I[feat_cols].to_numpy()
+    sigs = []
+    for p in edges["pools"]:
+        inside = (I[f"miner={p}"]).to_numpy()
+        outside = ~inside & ~I.get("miner=Unknown", pd.Series(False, index=I.index)).to_numpy()
+        c_ = [r for r in contrast(Md, feat_cols, inside, outside, 0.30) if (r["ratio"] or 0) > 1.2]
+        sigs.append({"pool": p, "blocks": int(inside.sum()), "top": c_[:4]})
+    sigs.sort(key=lambda r: -((r["top"][0]["ratio"] or 0) if r["top"] else 0))
     res = {"discovery_window": [c["window"][0], c["confirm_window"][0]], "confirm_window": c["confirm_window"],
            "transactions": n, "confirm_transactions": len(I2), "items": names, "bin_edges": edges,
            "item_support": {k: float(v) for k, v in I.mean().items()},
@@ -173,7 +205,8 @@ def run() -> dict:
            "apriori_trace": trace, "frequent_itemsets": len(support), "brute_force_check": check,
            "rules": rules[:150], "n_rules": len(rules),
            "solo_contrast": {"solo_blocks": int(solo_mask.sum()), "pool_blocks": int(pool_mask.sum()),
-                             "min_support_in_solo": 0.25, "itemsets": contrast[:40]}}
+                             "min_support_in_solo": 0.25, "itemsets": contrast_solo[:40]},
+           "pool_signatures": sigs}
     write_json(ARTIFACTS / "rules.json", res)
     print(f"apriori: {len(support)} frequent itemsets, {len(rules)} rules, brute force passed={check['passed']}")
     return res

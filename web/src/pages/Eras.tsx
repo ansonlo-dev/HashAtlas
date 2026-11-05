@@ -4,6 +4,9 @@ import { Err, Kpi, Loading, PageHead, Panel } from "../components/ui";
 import { useData, type Dict, type WeekRow } from "../lib/data";
 import { fmt, int, pct } from "../lib/format";
 
+// Cluster colours deliberately differ from the hardware-era colours, so nobody reads a cluster as an era.
+const CL = ["#f472b6", "#2dd4bf", "#60a5fa", "#fde047", "#c084fc", "#fb7185", "#94a3b8", "#86efac"];
+
 const FEAT_LABEL: Record<string, string> = {
   log_hashrate: "hash rate (log)", hashrate_growth_30d: "30-day growth", empty_share: "empty blocks", log_tx_per_block: "tx / block (log)",
   fullness: "fullness", fee_share: "fee share", unknown_share: "unattributed", hhi: "concentration (HHI)", log_hashprice_btc: "BTC per TH (log)",
@@ -20,16 +23,16 @@ export default function Eras() {
     const pts: Dict[] = [];
     tl.forEach((r) => {
       pts.push({ value: [r.w, 0], itemStyle: { color: ERA_COLORS[r.era] } });
-      pts.push({ value: [r.w, 1], itemStyle: { color: PALETTE[r.km! % PALETTE.length] } });
-      pts.push({ value: [r.w, 2], itemStyle: { color: PALETTE[((r.hw2 ?? 1) - 1) % PALETTE.length] } });
-      pts.push({ value: [r.w, 3], itemStyle: { color: r.db === -1 ? "#ffffff" : PALETTE[(r.db ?? 0) % PALETTE.length], opacity: r.db === -1 ? 1 : 0.85 } });
+      pts.push({ value: [r.w, 1], itemStyle: { color: CL[r.km! % CL.length] } });
+      pts.push({ value: [r.w, 2], itemStyle: { color: CL[((r.hw2 ?? 1) - 1) % CL.length] } });
+      pts.push({ value: [r.w, 3], itemStyle: { color: r.db === -1 ? "#ffffff" : CL[(r.db ?? 0) % CL.length], opacity: r.db === -1 ? 1 : 0.85 } });
     });
     const stripOpt = {
       tooltip: { ...tooltip({ trigger: "item" }), formatter: (p: Dict) => `${p.value[0]} · ${rows[p.value[1]]}` },
       grid: { left: 100, right: 16, top: 10, bottom: 30 },
       xAxis: { type: "time", ...axis() },
       yAxis: { type: "category", data: rows, inverse: true, ...axis({ axisLabel: { color: C.text2 } }) },
-      series: [{ type: "scatter", symbol: "rect", symbolSize: [3, 34], data: pts, large: true }],
+      series: [{ type: "scatter", symbol: "rect", symbolSize: [3, 34], data: pts, animation: false, progressive: 0 }],
     };
     const el = cl.elbow as Dict[];
     const elbowOpt = {
@@ -94,7 +97,8 @@ export default function Eras() {
       </div>
       <Panel className="mt" title="Rediscovering the mining eras" sub="Each tick is one week. Row 1 is the known hardware history (reference only); rows 2–4 are what three clustering families found on the same standardised rows. White = DBSCAN noise.">
         <EChart option={charts.stripOpt} height={210} ariaLabel="Timeline comparing hardware eras with K-means, Ward and DBSCAN clusters" />
-        <div className="legend-dots">{charts.eras.map((e) => <span key={e}><i style={{ background: ERA_COLORS[e] }} />{e}</span>)}</div>
+        <div className="legend-dots">{charts.eras.map((e) => <span key={e}><i style={{ background: ERA_COLORS[e] }} />{e}</span>)}
+          <span style={{ marginLeft: 12 }}>clusters (rows 2–4): {CL.slice(0, 4).map((c, i) => <span key={c}><i style={{ background: c }} />C{i} </span>)}<i style={{ background: "#fff" }} />noise</span></div>
       </Panel>
       <div className="grid g3 mt">
         <Panel title="Choosing K" sub="SSE always falls as K grows; we pick the silhouette maximum for K ≥ 3.">

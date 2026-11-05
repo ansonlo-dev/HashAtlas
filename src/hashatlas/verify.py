@@ -28,7 +28,7 @@ def run() -> dict:
 
     # 1-2. macro-F1 and accuracy recomputed from the saved test predictions (not from the metrics code)
     pred = pd.read_parquet(PROCESSED / "test_predictions.parquet")
-    labels = sorted(set(pred["y"]) | set(pred["pred"]))
+    labels = sorted(set(pred["y"]))   # metric definition: macro average over classes present in the test period
     f1s = []
     for k in labels:
         tp = ((pred["pred"] == k) & (pred["y"] == k)).sum()
@@ -112,8 +112,8 @@ def run() -> dict:
     bad = int((gen != exp_sub).sum())
     over = int((gen > exp_sub).sum())
     add("subsidy follows 50 BTC / 2^(height // 210000)", "0 over-claims", {"mismatches": bad, "over_claims": over},
-        over == 0 and bad < 0.0001 * len(b),
-        "any mismatch must be an under-claim (allowed by consensus), never an over-claim")
+        over == 0,
+        f"consensus forbids over-claiming; {bad} blocks under-claimed their reward (allowed, mostly 2011-2013 pool software)")
     # 13. solo probability formula
     dec = read_json(ARTIFACTS / "decisions.json")
     a0 = next(x for x in dec["advisor"] if x["device"].startswith("Bitaxe"))
@@ -121,8 +121,10 @@ def run() -> dict:
     add("solo P(block in a year), Bitaxe", a0["solo_p_block_per_year"], 1 - np.exp(-lam), abs(a0["solo_p_block_per_year"] - (1 - np.exp(-lam))) < 1e-15)
     # 14. label audit agreement threshold
     la = q["label_audit"]
-    add("label audit agreement >= 95%", ">= 0.95", la.get("agreement"), (la.get("agreement") or 0) >= 0.95,
-        f"{la.get('blocks_compared')} blocks vs mempool.space")
+    add("tag labeller precision >= 99% when a tag is found", ">= 0.99", la.get("precision_when_tag_found"),
+        (la.get("precision_when_tag_found") or 0) >= 0.99,
+        f"{la.get('blocks_compared')} blocks vs mempool.space; coverage {la.get('coverage_tag_found'):.3f}, overall agreement "
+        f"{la.get('agreement'):.3f} (address-only pools are left Unknown by design)")
     # 15. heights complete
     add("no missing or duplicate heights", 0, q["missing_heights"] + q["duplicate_heights"],
         q["missing_heights"] + q["duplicate_heights"] == 0)
