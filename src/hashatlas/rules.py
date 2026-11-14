@@ -1,17 +1,8 @@
-"""Stage 8 - association rules with a from-scratch Apriori (section 10).
+"""Mine discretised block properties with Apriori and check counts by brute force.
 
-Transactions: one modern block (2023-01 .. 2026-10) = one basket of discretised properties
-(empty, fullness band, version rolling, timestamp behaviour, fee policy relative to the day, witness-heavy
-content, input/output shape, block interval) plus the miner item (pool class, Solo or Unknown).
-Bin edges are fitted on the discovery window only.
-
-Apriori: level-wise candidate generation by joining frequent (k-1)-itemsets that share k-2 items, pruning any
-candidate with an infrequent subset (anti-monotonicity of support), then counting the survivors. Every level's
-candidate / pruned / counted / frequent numbers are recorded, and the result is checked against brute force.
-Rules are reported with support, confidence and lift (confidence divided by the consequent's base rate) and
-re-measured on a later confirmation window. Solo blocks are rare (support far below any global threshold), so
-a contrast analysis mines frequent itemsets *inside* Solo blocks and compares them with pool blocks.
-"""
+Bin edges use the discovery window. Candidate generation, subset pruning and
+support counts are recorded at each level. Rules are remeasured on a later
+window; within-pool and Solo contrasts retain signatures below global support."""
 from __future__ import annotations
 
 from itertools import combinations

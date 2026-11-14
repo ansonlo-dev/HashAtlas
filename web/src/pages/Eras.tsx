@@ -4,7 +4,7 @@ import { Err, Kpi, Loading, PageHead, Panel } from "../components/ui";
 import { useData, type Dict, type WeekRow } from "../lib/data";
 import { fmt, int, pct } from "../lib/format";
 
-// Cluster colours deliberately differ from the hardware-era colours, so nobody reads a cluster as an era.
+// Use separate palettes for fitted clusters and reference hardware-era labels.
 const CL = ["#b4432f", "#1f7a6d", "#4c78a8", "#c9a227", "#7b4b94", "#d4793a", "#8a8580", "#7a9a62"];
 
 const FEAT_LABEL: Record<string, string> = {
@@ -74,7 +74,7 @@ export default function Eras() {
       series: [...segs, { type: "line", data: [[0, pf.family_cut_height], [labels.length * 10, pf.family_cut_height]], showSymbol: false,
         lineStyle: { color: C.magenta, type: "dashed" }, silent: true }],
     };
-    // the dendrogram's x positions are 5, 15, 25, ...: put a label at each by using a custom interval
+    // SciPy leaf positions are 5, 15, 25, ...; label each leaf with a custom interval.
     (dendroOpt.xAxis as Dict).interval = 5;
     return { stripOpt, elbowOpt, radarOpt, dendroOpt, eras };
   }, [data]);

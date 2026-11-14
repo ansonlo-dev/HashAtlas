@@ -1,15 +1,8 @@
-"""Stage 7 - clustering (section 9).
+"""Cluster weekly mining metrics and pool fingerprint profiles.
 
-A. Mining eras from the data itself: one row per calendar week, 2009-2026 (~930 weeks), describing how blocks
-   were produced (hash-rate level and growth, empty blocks, block fullness, fee share, unattributed share,
-   pool concentration). K-means (elbow/SSE + silhouette, 25 initialisations, a hand-checked assignment/update
-   iteration), four hierarchical linkages (cophenetic correlation) and DBSCAN (k-distance eps, MinPts grid)
-   run on the *same* standardised weekly rows. Hardware eras are used only afterwards, to check (ARI) whether
-   the unsupervised groups rediscover CPU -> GPU -> ASIC -> industrial ASIC.
-B. Pool families: one profile per pool (2024-2026, >= 300 blocks) built from fingerprint features; hierarchical
-   clustering shows which pools build blocks the same way (shared templates / common operators).
-C. Anomalous blocks: DBSCAN noise on a recent block sample.
-"""
+K-means, four hierarchical linkages and DBSCAN use the same standardised weekly
+rows. Hardware-era labels are reserved for evaluation. Pool profiles form a
+separate hierarchical analysis; a recent block sample supplies the anomaly view."""
 from __future__ import annotations
 
 import numpy as np
