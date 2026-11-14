@@ -1,11 +1,8 @@
-"""Stage 6 - explanations that open the models up (sections 7-8).
+"""Export model traces and interpretation artifacts for the report and dashboard.
 
-* Decision tree: exported structure (for the web simulator), a hand-checked Gini split at the root with
-  weighted impurity reduction, Gini-vs-entropy and depth complexity curves, root-to-leaf traces of real blocks.
-* Permutation importance on the test period (which fingerprints actually carry information).
-* KNN: the actual neighbours, distances and vote for a real test block.
-* Linear SVM: the largest coefficients for the Solo class (after scaling).
-"""
+The tree export includes an unweighted root-split calculation. Other outputs
+cover permutation importance, a KNN neighbour example and Solo-class linear-SVM
+coefficients after scaling."""
 from __future__ import annotations
 
 import joblib

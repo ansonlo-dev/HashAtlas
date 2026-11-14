@@ -1,10 +1,8 @@
-"""Stage 5 - one-time evaluation on the sealed test period (2025-04 .. 2026-10) with the frozen choice.
+"""Score the frozen model choices on the sealed 2025-04 to 2026-10 test period.
 
-Every family's best configuration is refitted on train-sample + validation (as declared in model_selection.json)
-and scored on the same test blocks, so the benchmark is like-for-like. The operational model is the frozen one.
-Reports: macro-F1, balanced accuracy, per-class precision/recall/F1, confusion matrix, one-vs-rest ROC/PR for
-Solo, day-block bootstrap intervals, monthly drift, and where *new* pools (absent from training) are mapped.
-"""
+Each family is refitted on the declared train/validation sample and evaluated on
+the same test rows. Outputs include class metrics, Solo ROC/PR curves, day-block
+bootstrap intervals, monthly drift and predictions for newcomer pools."""
 from __future__ import annotations
 
 import joblib

@@ -1,10 +1,7 @@
-"""`hashatlas predict`: apply the frozen models to new examples.
+"""Predict miner classes for downloaded block heights or price a mining device.
 
-* `--heights H1 H2 ...`: fingerprint any downloaded block (e.g. blocks mined after the freeze) and print the
-  predicted miner class, the tree's class probabilities and the root-to-leaf path. The true label is printed
-  separately as "revealed_label" so the prediction can be checked afterwards.
-* `--ths T --watts W [--country C] [--price P]`: miner advice for a device at a country's electricity price.
-"""
+Block output separates the prediction from revealed_label and includes the tree
+path. Device output uses the selected economy's electricity tariff."""
 from __future__ import annotations
 
 import joblib

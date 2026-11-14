@@ -1,7 +1,6 @@
-"""Stage 11 - static figures for the report and slides (matplotlib, one consistent palette).
+"""Render report figures and slide copies from saved analysis artifacts.
 
-Every figure is drawn from artifacts/ or data/processed/, so a rerun regenerates the same pictures.
-"""
+Both output palettes use the same input data and figure definitions."""
 from __future__ import annotations
 
 import joblib

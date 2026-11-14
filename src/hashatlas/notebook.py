@@ -1,8 +1,7 @@
-"""Stage 14 - generate and execute a short walkthrough notebook (notebooks/hashatlas_walkthrough.ipynb).
+"""Build and execute the walkthrough notebook from saved analysis outputs.
 
-The notebook reads the committed artifacts and processed data, re-derives a few headline numbers in plain
-pandas, and shows key figures, so a reader can follow the analysis without running the whole pipeline.
-"""
+The notebook recomputes selected results with pandas and displays report figures
+without rerunning data acquisition or model training."""
 from __future__ import annotations
 
 import nbformat
