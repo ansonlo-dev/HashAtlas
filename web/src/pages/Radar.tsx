@@ -29,10 +29,14 @@ export default function Radar() {
       grid: { left: 110, right: 20, top: 10, bottom: 100 },
       xAxis: { type: "category", data: labels, name: "predicted", nameLocation: "middle", nameGap: 82, ...axis({ axisLabel: { color: C.muted, rotate: 50, fontSize: 10.5 } }) },
       yAxis: { type: "category", data: labels, inverse: true, ...axis({ axisLabel: { color: C.muted, fontSize: 10.5 } }) },
-      visualMap: { min: 0, max, show: false, inRange: { color: ["#0b1030", "#3b1d7a", "#7c3aed", "#f472b6", "#f7931a"] } },
-      series: [{ type: "heatmap", data: cells, itemStyle: { borderColor: "#04050d", borderWidth: 1.5, borderRadius: 3 },
-        label: { show: true, color: "#fff", fontSize: 9.5, formatter: (p: Dict) => (norm === "recall" ? (p.value[2] >= 0.05 ? fmt(p.value[2], 2) : "") : p.value[2] > 0 ? int(p.value[2]) : "") },
-        emphasis: { itemStyle: { shadowBlur: 16, shadowColor: C.btc } } }],
+      visualMap: { min: 0, max, show: false, inRange: { color: ["#fbf6ee", "#f9d9a8", "#f7931a", "#a65400", "#3b2410"] } },
+      series: [{ type: "heatmap", data: cells, itemStyle: { borderColor: "#fffdf9", borderWidth: 1.5, borderRadius: 3 },
+        label: { show: true, fontSize: 9.5, rich: { d: { color: "#4a453f", fontSize: 9.5 }, l: { color: "#fff", fontSize: 9.5, fontWeight: 600 } },
+          formatter: (p: Dict) => {
+            const t = norm === "recall" ? (p.value[2] >= 0.05 ? fmt(p.value[2], 2) : "") : p.value[2] > 0 ? int(p.value[2]) : "";
+            return t ? `{${p.value[2] / max > 0.45 ? "l" : "d"}|${t}}` : "";
+          } },
+        emphasis: { itemStyle: { borderColor: C.text, borderWidth: 2 } } }],
     };
     const names = ["tree", "knn", "svm_linear", "svm_rbf", "decision_stump", "stratified_random", "majority"];
     const cmpOpt = {
@@ -41,7 +45,7 @@ export default function Radar() {
       xAxis: { type: "category", data: names.map((n) => FAM[n]), ...axis({ axisLabel: { color: C.muted, fontSize: 10, interval: 0, rotate: 30 } }) },
       yAxis: { type: "value", name: "macro-F1", ...axis() },
       series: [
-        { name: "CV (2019–23)", type: "bar", data: names.map((n) => s[n].cv_macro_f1_mean ?? null), itemStyle: { color: "#5b4b9a", borderRadius: [4, 4, 0, 0] } },
+        { name: "CV (2019–23)", type: "bar", data: names.map((n) => s[n].cv_macro_f1_mean ?? null), itemStyle: { color: "#cfc2ae", borderRadius: [4, 4, 0, 0] } },
         { name: "validation", type: "bar", data: names.map((n) => s[n].validation.macro_f1), itemStyle: { color: C.violet, borderRadius: [4, 4, 0, 0] } },
         { name: "sealed test", type: "bar", data: names.map((n) => t.families[n].macro_f1), itemStyle: { color: C.btc, borderRadius: [4, 4, 0, 0], shadowBlur: 12, shadowColor: C.btc } },
       ],

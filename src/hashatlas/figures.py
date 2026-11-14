@@ -17,13 +17,14 @@ from sklearn.preprocessing import StandardScaler  # noqa: E402
 
 from .config import ARTIFACTS, FIGURES, INTERIM, MODELS, PROCESSED, cfg, read_json  # noqa: E402
 
-INK, MUTED, GRID = "#0B1530", "#5B6478", "#E3E7EF"
-BTC, VIOLET, CYAN, PINK, GREEN, BLUE, AMBER, RED = ("#F7931A", "#7C3AED", "#06B6D4", "#EC4899", "#10B981",
-                                                    "#3B82F6", "#F59E0B", "#EF4444")
-CYCLE = [BTC, VIOLET, CYAN, PINK, GREEN, BLUE, AMBER, RED, "#14B8A6", "#A855F7", "#64748B", "#84CC16"]
-ERA_COL = {"CPU": "#94A3B8", "GPU": CYAN, "FPGA/early ASIC": GREEN, "ASIC": VIOLET, "Industrial ASIC": BTC}
+# "Ledger" palette, shared with the dashboard, slides and video: Bitcoin orange + calm data colours on warm paper.
+INK, MUTED, GRID = "#1B1916", "#776F65", "#E9E2D6"
+BTC, VIOLET, CYAN, PINK, GREEN, BLUE, AMBER, RED = ("#F7931A", "#2F4858", "#1F7A6D", "#B4432F", "#2E7D4F",
+                                                    "#4C78A8", "#C9A227", "#B4432F")
+CYCLE = [BTC, VIOLET, CYAN, PINK, BLUE, AMBER, "#7B4B94", "#7A9A62", "#2A9D8F", "#B9A68A", "#8A8580", "#D4793A"]
+ERA_COL = {"CPU": "#A8A196", "GPU": BLUE, "FPGA/early ASIC": "#7A9A62", "ASIC": VIOLET, "Industrial ASIC": BTC}
 HALVINGS = ["2012-11-28", "2016-07-09", "2020-05-11", "2024-04-20"]
-NEON = LinearSegmentedColormap.from_list("neon", ["#FFFFFF", "#C4B5FD", VIOLET, "#4C1D95"])
+NEON = LinearSegmentedColormap.from_list("ledger", ["#FFFFFF", "#F9D9A8", BTC, "#A65400", "#3B2410"])
 
 
 OUT = FIGURES
@@ -31,19 +32,19 @@ FACE = "white"
 
 
 def style(dark: bool = False):
-    """Light style for the printed report; dark style (same palette) for the slide deck."""
+    """White figures for the printed report; paper-toned copies (same palette) for the slide deck in figures/dark/."""
     global INK, MUTED, GRID, OUT, FACE
     if dark:
-        INK, MUTED, GRID, FACE = "#EAF0FF", "#9AA3C7", "#1F2547", "#070A1A"
+        INK, MUTED, GRID, FACE = "#1B1916", "#776F65", "#E2D9CB", "#FFFDF9"
         OUT = FIGURES / "dark"
     else:
-        INK, MUTED, GRID, FACE = "#0B1530", "#5B6478", "#E3E7EF", "white"
+        INK, MUTED, GRID, FACE = "#1B1916", "#776F65", "#E9E2D6", "white"
         OUT = FIGURES
     OUT.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"figure.facecolor": FACE, "axes.facecolor": FACE, "text.color": INK, "savefig.facecolor": FACE,
                          "legend.labelcolor": INK})
     plt.rcParams.update({
-        "figure.dpi": 150, "savefig.dpi": 200, "font.size": 9.5, "font.family": "DejaVu Sans",
+        "figure.dpi": 150, "savefig.dpi": 200, "font.size": 9.5, "font.family": ["Inter", "DejaVu Sans"],
         "axes.edgecolor": MUTED, "axes.labelcolor": INK, "axes.titlecolor": INK, "axes.titleweight": "bold",
         "axes.titlesize": 11, "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.7,
         "axes.spines.top": False, "axes.spines.right": False, "xtick.color": MUTED, "ytick.color": MUTED,
@@ -100,7 +101,7 @@ def fig_who_mines():
     order = ["Unattributed (mostly solo / early)", "Solo services", "Pools", *top]
     t = t[[c for c in order if c in t]]
     fig, ax = plt.subplots(figsize=(9, 3.6))
-    cols = ["#CBD5E1", PINK, "#94A3B8", BTC, VIOLET, CYAN, GREEN, BLUE]
+    cols = ["#D9D1C4", PINK, "#A8A196", BTC, VIOLET, CYAN, GREEN, BLUE]
     ax.stackplot(t.index, t.T.to_numpy(), labels=t.columns, colors=cols[:len(t.columns)], alpha=0.95)
     ax.set_ylim(0, 1)
     ax.set_ylabel("share of blocks per quarter")
@@ -130,7 +131,7 @@ def fig_quality():
     q = read_json(ARTIFACTS / "quality_report.json")
     u = pd.Series(q["unknown_miner_share_by_year"]).astype(float)
     fig, ax = plt.subplots(1, 2, figsize=(9.5, 3.1))
-    ax[0].bar(u.index.astype(str), u.to_numpy(), color=[CYAN if int(y) >= 2019 else "#94A3B8" for y in u.index])
+    ax[0].bar(u.index.astype(str), u.to_numpy(), color=[CYAN if int(y) >= 2019 else "#A8A196" for y in u.index])
     ax[0].set_title("Unattributed (Unknown) share of blocks by year")
     ax[0].tick_params(axis="x", rotation=90, labelsize=7)
     src = pd.Series(q["labels"]["by_source"])
@@ -145,7 +146,7 @@ def fig_selection():
     mi = pd.Series(fs["mutual_information"]).sort_values(ascending=True).tail(30)
     sel = set(fs["selected"])
     fig, ax = plt.subplots(1, 2, figsize=(10, 5.2), gridspec_kw={"width_ratios": [1.3, 1]})
-    ax[0].barh(mi.index, mi.to_numpy(), color=[VIOLET if f in sel else "#CBD5E1" for f in mi.index])
+    ax[0].barh(mi.index, mi.to_numpy(), color=[VIOLET if f in sel else "#D9D1C4" for f in mi.index])
     ax[0].axvline(fs["mi_noise_cutoff"], color=RED, ls="--", lw=1)
     ax[0].text(fs["mi_noise_cutoff"], 0, " noise-probe cutoff", color=RED, fontsize=7.5)
     ax[0].set_title("Mutual information with the miner class (top 30)")
@@ -182,7 +183,7 @@ def fig_models():
     cv = [s[n].get("cv_macro_f1_mean", np.nan) for n in names]
     val = [s[n]["validation"]["macro_f1"] for n in names]
     te = [t["families"][n]["macro_f1"] for n in names]
-    ax.bar(x - 0.27, cv, 0.27, label="CV (train 2019-23)", color="#C4B5FD")
+    ax.bar(x - 0.27, cv, 0.27, label="CV (train 2019-23)", color="#D9D1C4")
     ax.bar(x, val, 0.27, label="validation (2024-25Q1)", color=VIOLET)
     ax.bar(x + 0.27, te, 0.27, label="sealed test (2025Q2-26)", color=BTC)
     ci = t["bootstrap"]["macro_f1_95ci"]
@@ -201,7 +202,7 @@ def fig_confusion():
     m = np.array(t["confusion"]["matrix"], dtype=float)
     r = m / m.sum(axis=1, keepdims=True).clip(min=1)
     fig, ax = plt.subplots(figsize=(6.8, 5.6))
-    cmap = NEON if FACE == "white" else LinearSegmentedColormap.from_list("neond", ["#0B1030", "#3B1D7A", VIOLET, PINK, BTC])
+    cmap = NEON
     im = ax.imshow(r, cmap=cmap, vmin=0, vmax=1)
     ax.set_xticks(range(len(labels)), labels, rotation=55, ha="right", fontsize=7.5)
     ax.set_yticks(range(len(labels)), labels, fontsize=7.5)
@@ -209,7 +210,7 @@ def fig_confusion():
         for j in range(len(labels)):
             if r[i, j] >= 0.05:
                 ax.text(j, i, f"{r[i, j]:.2f}", ha="center", va="center", fontsize=6.5,
-                        color="white" if (r[i, j] > 0.5 or FACE != "white") else INK)
+                        color="white" if r[i, j] > 0.45 else INK)
     ax.set_xlabel("predicted")
     ax.set_ylabel("true (row-normalised = recall)")
     ax.set_title("Who looks like whom: test-period confusion matrix")
@@ -283,11 +284,11 @@ def fig_clusters():
     w = pd.read_parquet(PROCESSED / "weeks.parquet")
     tcol = w.columns[0]
     fig, ax = plt.subplots(figsize=(9, 2.9))
-    CL = ["#F472B6", "#2DD4BF", "#60A5FA", "#FDE047", "#C084FC", "#FB7185"]   # never the era colours
+    CL = ["#B4432F", "#1F7A6D", "#4C78A8", "#C9A227", "#7B4B94", "#D4793A"]   # never the era colours
     rows = [("hardware era", w["era"].map({e: i for i, e in enumerate(ERA_COL)}), list(ERA_COL.values())),
             ("K-means", w["kmeans"], CL), ("Ward", w["hier_ward"] - 1, CL), ("DBSCAN", w["dbscan"], CL)]
     for i, (name, lab, cols) in enumerate(rows):
-        c = [(INK if FACE != "white" else "#111827") if v < 0 else cols[int(v) % len(cols)] for v in lab]
+        c = [INK if v < 0 else cols[int(v) % len(cols)] for v in lab]
         ax.scatter(w[tcol], np.full(len(w), i), c=c, marker="|", s=260, lw=2.2)
     ax.set_yticks(range(len(rows)), [r[0] for r in rows])
     ax.set_ylim(-0.6, len(rows) - 0.4)
@@ -304,7 +305,7 @@ def fig_clusters():
     L = linkage(Z, method="average")
     fig, ax = plt.subplots(figsize=(9, 4.4))
     dendrogram(L, labels=prof.index.tolist(), leaf_rotation=60, leaf_font_size=7.5, ax=ax,
-               color_threshold=pf["family_cut_height"], above_threshold_color="#94A3B8")
+               color_threshold=pf["family_cut_height"], above_threshold_color="#A8A196")
     ax.axhline(pf["family_cut_height"], color=PINK, ls="--", lw=1)
     ax.set_title("Pool families: average-linkage dendrogram of block-building fingerprints (2024-2026)")
     ax.set_ylabel("Euclidean distance (standardised profiles)")
@@ -329,13 +330,13 @@ def fig_advisor():
     a = pd.DataFrame(dc["advisor"])
     s = a[(a["device"] == "Antminer S21") & (a["tariff"] == "business")].sort_values("price_usd_kwh")
     fig, ax = plt.subplots(figsize=(9, 3.6))
-    ax.bar(s["country"], s["price_usd_kwh"], color=[CYAN if x else "#CBD5E1" for x in s["asia"]])
+    ax.bar(s["country"], s["price_usd_kwh"], color=[CYAN if x else "#D9D1C4" for x in s["asia"]])
     be = float(s["breakeven_usd_kwh"].iloc[0])
     ax.axhline(be, color=BTC, lw=2)
     ax.text(0, be * 1.05, f"S21 break-even {be:.3f} USD/kWh", color=BTC, fontsize=8, fontweight="bold")
     ax.tick_params(axis="x", rotation=65, labelsize=7.5)
     ax.set_ylabel("business electricity (USD/kWh)")
-    ax.set_title("Where does an Antminer S21 pay for its electricity? (cyan = Asia)")
+    ax.set_title("Where does an Antminer S21 pay for its electricity? (teal = Asia)")
     save(fig, "f16_advisor")
 
 
