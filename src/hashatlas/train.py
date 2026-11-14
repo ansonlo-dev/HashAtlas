@@ -1,14 +1,8 @@
-"""Stage 4 - feature selection, model search and model selection (block fingerprinting).
+"""Select fingerprints and tune model families without opening the sealed test.
 
-Task: given only what a block reveals about how it was built (header bit patterns, timing, body composition),
-which mining entity produced it? Classes are the large pools of the training period, one "Solo" class
-(the six solo-mining services) and "Other pools". Unknown blocks are never used for fitting.
-
-Validation design (section 6):
-  train 2019-2023 -> grouped 5-fold CV (groups = calendar months) for hyper-parameters and nested CV estimate
-  validation 2024-01..2025-03 (out of time) -> choose the model family and the Solo operating threshold
-  test 2025-04..2026-10 (sealed) -> evaluated once in evaluate.py with the frozen choice
-"""
+Month-grouped CV uses 2019-2023 training data. The 2024-01 to 2025-03 validation
+period selects the model family and Solo threshold. evaluate.py later applies
+the frozen choices to 2025-04 to 2026-10. Unknown blocks are excluded from fitting."""
 from __future__ import annotations
 
 import time
@@ -88,7 +82,7 @@ def sample_train(train: pd.DataFrame, n: int, seed: int) -> pd.DataFrame:
     return pd.concat([rest, solo]).sort_values("time")
 
 
-# ------------------------------------------------------------------ feature selection (training data only)
+# Feature selection (training data only)
 def select_features(tr: pd.DataFrame, seed: int) -> dict:
     X = tr[BLOCK_FEATURES_BASE].astype(float)
     y = tr["y"]
@@ -150,7 +144,7 @@ def select_features(tr: pd.DataFrame, seed: int) -> dict:
     return log
 
 
-# ------------------------------------------------------------------ model families
+# Model families
 def families(seed: int) -> dict:
     c = cfg()["classification"]
     scaled = lambda est: Pipeline([("scale", StandardScaler()), ("model", est)])  # noqa: E731

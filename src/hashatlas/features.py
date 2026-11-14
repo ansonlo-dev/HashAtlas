@@ -1,16 +1,9 @@
-"""Stage 3 - feature construction and transformation.
+"""Build block fingerprints and daily network-economics tables.
 
-Two observation units:
-  * block (fingerprint features, 2019+): what a miner's software leaves in the header and the block body.
-    Coinbase text, payout address, height and calendar time are excluded because they either *are* the label
-    or only encode market share over time (section 5).
-  * day (2009-2026): network economics and block-production structure for era discovery and decisions.
-
-Transformations (section 5): bit decomposition of the version and nonce fields (nominal bit fields must not be
-used as integers), log1p of heavy-tailed counts, ratios and shares, day-relative normalisation (removes market
-conditions so that only template *policy* remains), cyclic encoding of the hour (a deliberately irrelevant
-control feature that selection should remove), and frontier-hardware break-even electricity prices.
-"""
+Fingerprints use version/nonce bits, block composition, log transforms and
+within-day comparisons. Label sources, height and calendar time are excluded
+from model inputs. Daily aggregates and the hardware-efficiency frontier support
+the era analysis and decision scenarios."""
 from __future__ import annotations
 
 import json
