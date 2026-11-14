@@ -1,12 +1,12 @@
 {
- "started": "2026-11-12T19:53:23.736Z",
+ "started": "2026-11-13T18:50:55.925Z",
  "base_url": "http://localhost:4191/",
  "browser": "157.0.8103.78",
  "checks": [
   {
    "id": "overview: renders",
    "pass": true,
-   "detail": "10 panels, 4 canvases, 2293 ms"
+   "detail": "10 panels, 3 canvases, 2465 ms"
   },
   {
    "id": "overview: no horizontal overflow at 1440px",
@@ -16,7 +16,7 @@
   {
    "id": "radar: renders",
    "pass": true,
-   "detail": "18 panels, 9 canvases, 1865 ms"
+   "detail": "18 panels, 8 canvases, 1858 ms"
   },
   {
    "id": "radar: no horizontal overflow at 1440px",
@@ -26,7 +26,7 @@
   {
    "id": "simulator: renders",
    "pass": true,
-   "detail": "8 panels, 2 canvases, 1762 ms"
+   "detail": "8 panels, 1 canvases, 2228 ms"
   },
   {
    "id": "simulator: no horizontal overflow at 1440px",
@@ -36,7 +36,7 @@
   {
    "id": "eras: renders",
    "pass": true,
-   "detail": "13 panels, 6 canvases, 2213 ms"
+   "detail": "13 panels, 5 canvases, 2216 ms"
   },
   {
    "id": "eras: no horizontal overflow at 1440px",
@@ -46,7 +46,7 @@
   {
    "id": "rules: renders",
    "pass": true,
-   "detail": "9 panels, 2 canvases, 1753 ms"
+   "detail": "9 panels, 1 canvases, 1755 ms"
   },
   {
    "id": "rules: no horizontal overflow at 1440px",
@@ -56,7 +56,7 @@
   {
    "id": "advisor: renders",
    "pass": true,
-   "detail": "7 panels, 3 canvases, 2221 ms"
+   "detail": "7 panels, 2 canvases, 2210 ms"
   },
   {
    "id": "advisor: no horizontal overflow at 1440px",
@@ -66,7 +66,7 @@
   {
    "id": "future: renders",
    "pass": true,
-   "detail": "10 panels, 5 canvases, 2211 ms"
+   "detail": "10 panels, 4 canvases, 2217 ms"
   },
   {
    "id": "future: no horizontal overflow at 1440px",
@@ -76,7 +76,7 @@
   {
    "id": "methods: renders",
    "pass": true,
-   "detail": "11 panels, 1 canvases, 2208 ms"
+   "detail": "11 panels, 0 canvases, 2223 ms"
   },
   {
    "id": "methods: no horizontal overflow at 1440px",
@@ -145,7 +145,7 @@
   "screenshots/web-390-advisor.png",
   "screenshots/web-390-future.png"
  ],
- "finished": "2026-11-12T19:54:00.430Z",
+ "finished": "2026-11-13T18:51:30.811Z",
  "passed": 25,
  "total": 25
 }
