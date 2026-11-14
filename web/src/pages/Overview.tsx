@@ -8,19 +8,26 @@ const HALVINGS = ["2012-11-28", "2016-07-09", "2020-05-11", "2024-04-20"];
 const ERA_STARTS = [["CPU", "2009-01-03"], ["GPU", "2010-07-18"], ["FPGA/early ASIC", "2011-06-01"], ["ASIC", "2013-01-31"], ["Industrial ASIC", "2016-06-01"]];
 
 function Orbit() {
+  // A chain of blocks climbing from the genesis block (2009) to the data freeze; the last block is Bitcoin orange.
+  const B = [["0", "2009"], ["210k", "2012"], ["420k", "2016"], ["630k", "2020"], ["840k", "2024"]];
   return (
-    <svg className="hero-orbit" viewBox="0 0 360 360" aria-hidden="true">
-      <defs>
-        <radialGradient id="core"><stop offset="0" stopColor="#f7931a" stopOpacity=".9" /><stop offset="1" stopColor="#f7931a" stopOpacity="0" /></radialGradient>
-      </defs>
-      <circle cx="180" cy="180" r="60" fill="url(#core)" />
-      {[90, 125, 160].map((r, i) => (
-        <g key={r} style={{ transformOrigin: "180px 180px", animation: `spin ${18 + i * 10}s linear infinite ${i % 2 ? "reverse" : ""}` }}>
-          <circle cx="180" cy="180" r={r} fill="none" stroke={["#a78bfa", "#22d3ee", "#f472b6"][i]} strokeOpacity=".35" strokeDasharray="4 7" />
-          <circle cx={180 + r} cy="180" r="5" fill={["#a78bfa", "#22d3ee", "#f472b6"][i]} style={{ filter: "drop-shadow(0 0 6px currentColor)" }} />
-        </g>
-      ))}
-      <text x="180" y="188" textAnchor="middle" fontSize="30" fontFamily="Orbitron" fill="#fff" opacity=".9">₿</text>
+    <svg className="hero-orbit" viewBox="0 0 330 300" aria-hidden="true">
+      {B.map(([h, y], i) => {
+        const x = 8 + i * 50, yy = 232 - i * 46;
+        return (
+          <g key={h}>
+            {i > 0 && <path d={`M${x - 14} ${yy + 64}L${x} ${yy + 18}`} stroke="#cfc2ae" strokeWidth="2" />}
+            <rect x={x} y={yy} width="36" height="36" rx="2" fill="#fffdf9" stroke="#1b1916" strokeWidth="1.6" />
+            <text x={x + 18} y={yy + 22} textAnchor="middle" fontSize="9.5" fontFamily="IBM Plex Mono" fill="#4a453f">{h}</text>
+            <text x={x + 18} y={yy + 52} textAnchor="middle" fontSize="9" fontFamily="IBM Plex Mono" fill="#776f65">{y}</text>
+          </g>
+        );
+      })}
+      <path d="M244 66L254 24" stroke="#cfc2ae" strokeWidth="2" />
+      <rect x="254" y="2" width="44" height="44" rx="2" fill="#f7931a" stroke="#1b1916" strokeWidth="1.6" />
+      <text x="276" y="29" textAnchor="middle" fontSize="18" fontFamily="Source Serif 4 Variable, serif" fontWeight="700" fill="#1b1916">₿</text>
+      <text x="276" y="60" textAnchor="middle" fontSize="9" fontFamily="IBM Plex Mono" fill="#a65400">975k</text>
+      <text x="276" y="72" textAnchor="middle" fontSize="9" fontFamily="IBM Plex Mono" fill="#776f65">2026</text>
     </svg>
   );
 }
@@ -39,8 +46,8 @@ export default function Overview() {
         { type: "log", name: "hash rate", max: (v: { max: number }) => 10 ** Math.ceil(Math.log10(v.max)), ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => hashUnit(v) } }) },
         { type: "log", name: "J / TH", ...axis({ splitLine: { show: false } }) },
       ],
-      dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", backgroundColor: "rgba(255,255,255,0.03)",
-        fillerColor: "rgba(167,139,250,0.18)", handleStyle: { color: C.btc }, textStyle: { color: C.muted } }],
+      dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", backgroundColor: "rgba(27,25,22,0.03)",
+        fillerColor: "rgba(247,147,26,0.15)", handleStyle: { color: C.btc }, textStyle: { color: C.muted } }],
       series: [
         { name: "network hash rate", type: "line", showSymbol: false, data: tl.map((r) => [r.w, r.h]), itemStyle: { color: C.violet }, lineStyle: glowLine(C.violet, 2.2), areaStyle: areaGrad(C.violet, 0.25),
           markArea: { silent: true, data: ERA_STARTS.map(([n, s], i) => [{ name: n, xAxis: s, itemStyle: { color: ERA_COLORS[n] + "14" }, label: { color: ERA_COLORS[n], fontSize: 10, position: "insideTopLeft" } }, { xAxis: ERA_STARTS[i + 1]?.[1] ?? tl[tl.length - 1].w }]) },
@@ -51,7 +58,7 @@ export default function Overview() {
     };
     const wm = data.whomines;
     const groups = Object.keys(wm.groups);
-    const cols: Record<string, string> = { Unattributed: "#475569", "Solo services": C.magenta, "Other pools": "#64748b" };
+    const cols: Record<string, string> = { Unattributed: "#a8a196", "Solo services": C.magenta, "Other pools": "#cfc2ae" };
     const whoOpt = {
       tooltip: tooltip({ valueFormatter: (v: number) => pct(v, 1) }),
       legend: legend({ type: "scroll", bottom: 0 }),
