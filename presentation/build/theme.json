@@ -1,0 +1,19 @@
+{
+ "name": "HashAtlas Neon",
+ "headFontFace": "Calibri",
+ "bodyFontFace": "Calibri",
+ "colors": {
+  "dk1": "070A1A",
+  "lt1": "FFFFFF",
+  "dk2": "1A2150",
+  "lt2": "EAF0FF",
+  "accent1": "F7931A",
+  "accent2": "A78BFA",
+  "accent3": "22D3EE",
+  "accent4": "F472B6",
+  "accent5": "A3E635",
+  "accent6": "60A5FA",
+  "hlink": "22D3EE",
+  "folHlink": "A78BFA"
+ }
+}

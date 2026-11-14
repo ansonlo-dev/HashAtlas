@@ -36,16 +36,16 @@ export default function Overview() {
       grid: { left: 60, right: 60, top: 34, bottom: 56 },
       xAxis: { type: "time", ...axis() },
       yAxis: [
-        { type: "log", name: "hash rate (EH/s)", ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => hashUnit(v) } }) },
+        { type: "log", name: "hash rate", max: (v: { max: number }) => 10 ** Math.ceil(Math.log10(v.max)), ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => hashUnit(v) } }) },
         { type: "log", name: "J / TH", ...axis({ splitLine: { show: false } }) },
       ],
       dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", backgroundColor: "rgba(255,255,255,0.03)",
         fillerColor: "rgba(167,139,250,0.18)", handleStyle: { color: C.btc }, textStyle: { color: C.muted } }],
       series: [
-        { name: "network hash rate", type: "line", showSymbol: false, data: tl.map((r) => [r.w, r.h]), lineStyle: glowLine(C.violet, 2.2), areaStyle: areaGrad(C.violet, 0.25),
+        { name: "network hash rate", type: "line", showSymbol: false, data: tl.map((r) => [r.w, r.h]), itemStyle: { color: C.violet }, lineStyle: glowLine(C.violet, 2.2), areaStyle: areaGrad(C.violet, 0.25),
           markArea: { silent: true, data: ERA_STARTS.map(([n, s], i) => [{ name: n, xAxis: s, itemStyle: { color: ERA_COLORS[n] + "14" }, label: { color: ERA_COLORS[n], fontSize: 10, position: "insideTopLeft" } }, { xAxis: ERA_STARTS[i + 1]?.[1] ?? tl[tl.length - 1].w }]) },
           markLine: { silent: true, symbol: "none", lineStyle: { color: C.btc, type: "dashed", opacity: 0.7 }, label: { formatter: "halving", color: C.btc, fontSize: 10 }, data: HALVINGS.map((x) => ({ xAxis: x })) } },
-        { name: "best hardware (J/TH)", type: "line", yAxisIndex: 1, step: "end", showSymbol: false, data: tl.map((r) => [r.w, r.fr]), lineStyle: glowLine(C.btc, 1.8),
+        { name: "best hardware (J/TH)", type: "line", yAxisIndex: 1, step: "end", showSymbol: false, data: tl.map((r) => [r.w, r.fr]), itemStyle: { color: C.btc }, lineStyle: glowLine(C.btc, 1.8),
           tooltip: { valueFormatter: (v: number) => `${fmt(v, 1)} J/TH` } },
       ],
     };
@@ -59,7 +59,8 @@ export default function Overview() {
       xAxis: { type: "category", data: wm.quarters, ...axis({ axisLabel: { color: C.muted, interval: 7 } }) },
       yAxis: { type: "value", max: 1, ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => pct(v, 0) } }) },
       series: groups.map((g, i) => ({ name: g, type: "line", stack: "s", showSymbol: false, smooth: 0.2, data: wm.groups[g],
-        lineStyle: { width: 0 }, areaStyle: { color: cols[g] ?? PALETTE[(i - 3 + PALETTE.length) % PALETTE.length], opacity: 0.88 }, emphasis: { focus: "series" } })),
+        lineStyle: { width: 0 }, itemStyle: { color: cols[g] ?? PALETTE[(i - 3 + PALETTE.length) % PALETTE.length] },
+        areaStyle: { color: cols[g] ?? PALETTE[(i - 3 + PALETTE.length) % PALETTE.length], opacity: 0.88 }, emphasis: { focus: "series" } })),
     };
     const sy = Object.entries(wm.solo_by_year as Record<string, number>);
     const soloOpt = {
@@ -68,7 +69,7 @@ export default function Overview() {
       yAxis: [{ type: "log", min: 1e-6, max: 1, ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => odds(v) } }) },
         { type: "value", name: "solo blocks / yr", ...axis({ splitLine: { show: false } }) }],
       series: [
-        { name: "P(1.2 TH/s miner wins ≥1 block in a year)", type: "line", showSymbol: false, data: tl.filter((r) => r.sp).map((r) => [r.w, r.sp]), lineStyle: glowLine(C.magenta, 2),
+        { name: "P(1.2 TH/s miner wins ≥1 block in a year)", type: "line", showSymbol: false, data: tl.filter((r) => r.sp).map((r) => [r.w, r.sp]), itemStyle: { color: C.magenta }, lineStyle: glowLine(C.magenta, 2),
           areaStyle: areaGrad(C.magenta, 0.2), tooltip: { valueFormatter: (v: number) => odds(v) } },
         { name: "solo-service blocks per year", type: "bar", yAxisIndex: 1, barWidth: 10, data: sy.map(([y, n]) => [`${y}-07-01`, n]),
           itemStyle: { color: C.cyan, shadowColor: C.cyan, shadowBlur: 10, borderRadius: [4, 4, 0, 0] } },
@@ -100,10 +101,10 @@ export default function Overview() {
       </section>
 
       <div className="grid g5 mt">
-        <Kpi label="Network hash rate" value={hashUnit(h.hashrate_eh)} note={`vs ${hashUnit(data.timeline.find((r) => r.h)?.h)} in ${data.timeline.find((r) => r.h)?.w.slice(0, 7)}`} glow="violet" />
+        <Kpi label="Network hash rate" value={hashUnit(h.hashrate_eh)} note={`vs ${hashUnit(data.timeline.find((r) => r.h)?.h)} at the genesis block (Jan 2009)`} glow="violet" />
         <Kpi label="Home-miner odds / year" value={odds(h.solo_p_bitaxe)} note="1.2 TH/s device winning ≥ 1 block" glow="magenta" />
-        <Kpi label="Fingerprint model" value={fmt(h.macro_f1_test, 3)} note={`macro-F1 on sealed 2025-26 test (95% CI ${fmt(h.macro_f1_ci[0], 2)}–${fmt(h.macro_f1_ci[1], 2)})`} glow="cyan" />
-        <Kpi label="Nakamoto coefficient" value={`${h.nakamoto} → ${h.nakamoto_family}`} note="entities for >50% of blocks: by pool name → after merging fingerprint families" glow="btc" />
+        <Kpi label="Fingerprint model" value={fmt(h.macro_f1_test, 3)} note={`macro-F1, sealed 2025-26 test, ${h.n_classes} classes (95% CI ${fmt(h.macro_f1_ci[0], 2)}–${fmt(h.macro_f1_ci[1], 2)}); true pool in top 3: ${pct(h.top3, 0)}`} glow="cyan" />
+        <Kpi label="Nakamoto coefficient" value={`${h.nakamoto}`} note={`pools needed for >50% of blocks (last 12 months); ${h.nakamoto_family} if look-alike fingerprint families were one builder (upper bound)`} glow="btc" />
         <Kpi label="S21 break-even power" value={`${usd(h.breakeven_s21, 3)}/kWh`} note={`at ${usd(h.price_usd, 0)} BTC · hash price ${usd(h.hashprice, 4)}/TH/day`} glow="lime" />
       </div>
 

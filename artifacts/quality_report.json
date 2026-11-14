@@ -1,0 +1,177 @@
+{
+ "files_expected": 3650,
+ "files_missing": [
+  "20090104.tsv.gz",
+  "20090105.tsv.gz",
+  "20090106.tsv.gz",
+  "20090107.tsv.gz",
+  "20090108.tsv.gz",
+  "20110507.tsv.gz",
+  "20110508.tsv.gz",
+  "20120502.tsv.gz",
+  "20120611.tsv.gz",
+  "20121229.tsv.gz",
+  "20121230.tsv.gz",
+  "20130318.tsv.gz",
+  "20130507.tsv.gz",
+  "20130523.tsv.gz",
+  "20130613.tsv.gz",
+  "20130713.tsv.gz",
+  "20130826.tsv.gz",
+  "20140417.tsv.gz",
+  "20140429.tsv.gz",
+  "20140522.tsv.gz",
+  "20140804.tsv.gz",
+  "20141103.tsv.gz",
+  "20141223.tsv.gz",
+  "20150306.tsv.gz",
+  "20150307.tsv.gz",
+  "20151121.tsv.gz",
+  "20160511.tsv.gz",
+  "20161016.tsv.gz",
+  "20170114.tsv.gz",
+  "20170127.tsv.gz",
+  "20170315.tsv.gz",
+  "20170408.tsv.gz",
+  "20170701.tsv.gz",
+  "20171114.tsv.gz",
+  "20171126.tsv.gz",
+  "20180609.tsv.gz",
+  "20180813.tsv.gz",
+  "20180831.tsv.gz",
+  "20181226.tsv.gz"
+ ],
+ "rows_loaded": 975494,
+ "mempool_rows": 424542,
+ "mempool_stale_removed": 0,
+ "rows_from_dumps": 551030,
+ "rows_from_mempool": 424542,
+ "height_range": [
+  0,
+  975493
+ ],
+ "duplicate_heights": 0,
+ "missing_heights": 0,
+ "missing_values": {
+  "input_total": 424464,
+  "output_total": 424464,
+  "cdd_total": 424464
+ },
+ "timestamp_earlier_than_previous_block": 16279,
+ "timestamp_earlier_than_previous_share": 0.01668795502586382,
+ "max_backwards_seconds": 7125.0,
+ "intervals_over_2h": 154,
+ "time_minus_median_time_negative": 63,
+ "difficulty_changes_off_retarget": 0,
+ "empty_blocks": 89947,
+ "weight_over_limit": 0,
+ "coinbase_hex_missing": 0,
+ "unknown_miner_share_by_year": {
+  "2009": 1.0,
+  "2010": 1.0,
+  "2011": 0.9646,
+  "2012": 0.6402,
+  "2013": 0.1779,
+  "2014": 0.1424,
+  "2015": 0.0594,
+  "2016": 0.0161,
+  "2017": 0.0355,
+  "2018": 0.0618,
+  "2019": 0.0564,
+  "2020": 0.0125,
+  "2021": 0.0227,
+  "2022": 0.0006,
+  "2023": 0.0009,
+  "2024": 0.0009,
+  "2025": 0.0059,
+  "2026": 0.0015
+ },
+ "handling": {
+  "out_of_order_timestamps": "kept: allowed by consensus (must exceed median of previous 11 blocks); they carry miner clock / ntime-rolling behaviour, so they are a feature",
+  "missing_values": "fee_per_kwu recomputed as fee_total / weight * 1000 where missing; input_total, output_total and cdd_total are not provided by mempool.space (2019+) and are not used; fee_min / fee_median / match_rate exist only for mempool.space rows (2019+), which is the only period where block fingerprints are modelled",
+  "noise": "heavy-tailed counts (fees, cdd, transactions) are log-transformed in features; no extreme values are deleted because extremes (e.g. inscription-era blocks) are genuine",
+  "labels": "Unknown miner is a genuine 'not attributable' state, not a missing value; Unknown blocks are excluded from supervised training and become the application set"
+ },
+ "labels": {
+  "by_source": {
+   "mempool_attribution": 424373,
+   "coinbase_tag": 254906,
+   "none": 220798,
+   "blockchair_address_guess": 75068,
+   "mempool_solo_list": 349
+  },
+  "solo_overrides_changed": 0,
+  "tag_definitions": 207,
+  "solo_blocks": 349
+ },
+ "label_audit": {
+  "method": "coinbase-tag labeller re-applied to mempool.space-labelled blocks (2019+)",
+  "blocks_compared": 424464,
+  "agreement": 0.9415144747257718,
+  "precision_when_tag_found": 0.9995346270531721,
+  "coverage_tag_found": 0.9264224999057635,
+  "top_disagreements": [
+   {
+    "mempool": "F2Pool",
+    "ours": "Unknown",
+    "n": 11426
+   },
+   {
+    "mempool": "CloverPool",
+    "ours": "Unknown",
+    "n": 4787
+   },
+   {
+    "mempool": "SECPOOL",
+    "ours": "Unknown",
+    "n": 2401
+   },
+   {
+    "mempool": "Poolin",
+    "ours": "Unknown",
+    "n": 1426
+   },
+   {
+    "mempool": "MARA Pool",
+    "ours": "Unknown",
+    "n": 1269
+   },
+   {
+    "mempool": "Carbon Negative",
+    "ours": "Unknown",
+    "n": 1263
+   },
+   {
+    "mempool": "Rawpool",
+    "ours": "Unknown",
+    "n": 463
+   },
+   {
+    "mempool": "Mining Squared",
+    "ours": "Unknown",
+    "n": 331
+   },
+   {
+    "mempool": "GHash.IO",
+    "ours": "Unknown",
+    "n": 285
+   },
+   {
+    "mempool": "1M1X",
+    "ours": "Unknown",
+    "n": 188
+   },
+   {
+    "mempool": "Huobi.pool",
+    "ours": "EMCDPool",
+    "n": 176
+   },
+   {
+    "mempool": "Luxor",
+    "ours": "Unknown",
+    "n": 134
+   }
+  ]
+ },
+ "under_claimed_reward_blocks": 1124
+}

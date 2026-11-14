@@ -1,0 +1,104 @@
+% HashAtlas group project report: typography and layout (LuaLaTeX; microtype protrusion and expansion).
+% Layout follows common academic technical-report conventions: serif body, sans-serif headings,
+% booktabs tables, numbered figure captions, running headers and a separate title page.
+
+% ---------------------------------------------------------------- colours (product palette)
+\definecolor{ReportInk}{HTML}{111633}
+\definecolor{ReportInkTwo}{HTML}{3B3F63}
+\definecolor{ReportAccent}{HTML}{6D28D9}
+\definecolor{ReportAmber}{HTML}{D97706}
+\definecolor{ReportRule}{HTML}{C9D3DF}
+\definecolor{ReportMuted}{HTML}{5B6B7D}
+
+% ---------------------------------------------------------------- fonts (Libertinus from TeX Live)
+\setmainfont{LibertinusSerif}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-Semibold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiboldItalic, Ligatures=TeX, Numbers=Lining]
+\setsansfont{LibertinusSans}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, Numbers=Lining]
+\setmonofont{LibertinusMono}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-Regular, BoldFeatures={FakeBold=1.2}, Scale=0.88]
+\setmathfont{LibertinusMath-Regular.otf}
+\linespread{1.08}
+
+\microtypesetup{protrusion=true,expansion=true}
+\usepackage{float}
+\usepackage{needspace}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[font=small,labelfont={bf,sf,color=ReportInk},labelsep=period,skip=6pt]{caption}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,leftmargin=1.4em}
+
+% Keep figures in reading order next to the text that introduces them.
+\floatplacement{figure}{H}
+\setlength{\emergencystretch}{2.5em}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\widowpenalty=10000
+\clubpenalty=10000
+
+% ---------------------------------------------------------------- headings
+\titleformat{\section}{\sffamily\Large\bfseries\color{ReportInk}}{\color{ReportAccent}\thesection}{0.75em}{}
+\titleformat{\subsection}{\sffamily\large\bfseries\color{ReportInk}}{\color{ReportAccent}\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{18pt plus 4pt minus 2pt}{6pt plus 2pt}
+\titlespacing*{\subsection}{0pt}{12pt plus 3pt minus 2pt}{4pt plus 1pt}
+
+% ---------------------------------------------------------------- table of contents
+\renewcommand{\cfttoctitlefont}{\sffamily\Large\bfseries\color{ReportInk}}
+\renewcommand{\cftsecfont}{\sffamily\bfseries\color{ReportInk}}
+\renewcommand{\cftsecpagefont}{\sffamily\bfseries\color{ReportInk}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{5pt}
+\renewcommand{\contentsname}{Contents}
+
+% ---------------------------------------------------------------- tables (pandoc longtable + booktabs)
+\setlength{\LTpre}{8pt}
+\setlength{\LTpost}{8pt}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\aboverulesep}{0.3ex}
+\setlength{\belowrulesep}{0.5ex}
+\setlength{\heavyrulewidth}{0.9pt}
+\setlength{\lightrulewidth}{0.5pt}
+\newenvironment{reporttable}{\par\small\sffamily}{\par}
+\newenvironment{reporttablesmall}{\par\footnotesize\sffamily}{\par}
+
+% ---------------------------------------------------------------- inline code (file paths, fields)
+\newcommand{\code}[1]{{\ttfamily\color{ReportInkTwo}#1}}
+
+% ---------------------------------------------------------------- running headers
+\fancypagestyle{report}{%
+  \fancyhf{}%
+  \fancyhead[L]{\sffamily\footnotesize\color{ReportMuted}\ReportShortTitle}%
+  \fancyhead[R]{\sffamily\footnotesize\color{ReportMuted}\nouppercase{\leftmark}}%
+  \fancyfoot[C]{\sffamily\footnotesize\color{ReportMuted}\thepage\ of \pageref*{LastPage}}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+  \renewcommand{\headrule}{{\color{ReportRule}\hrule width\headwidth height\headrulewidth}}%
+}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\sffamily\footnotesize\color{ReportMuted}\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+\renewcommand{\sectionmark}[1]{\markboth{\thesection\quad #1}{}}
+
+% ---------------------------------------------------------------- title page
+\newcommand{\HashAtlasTitlePage}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \vspace*{30mm}
+    {\sffamily\small\bfseries\color{ReportAccent}\MakeUppercase{\ReportKind}\par}
+    \vspace{6mm}
+    {\color{ReportRule}\rule{\linewidth}{0.8pt}\par}
+    \vspace{10mm}
+    {\sffamily\fontsize{28}{34}\selectfont\bfseries\color{ReportInk}\raggedright\ReportTitle\par}
+    \vspace{8mm}
+    {\sffamily\Large\color{ReportInkTwo}\raggedright\ReportSubtitle\par}
+    \vspace{8mm}
+    {\sffamily\normalsize\color{ReportInk}\raggedright\ReportTeam\par}
+    \vspace{10mm}
+    {\color{ReportRule}\rule{\linewidth}{0.8pt}\par}
+    \vspace{6mm}
+    {\sffamily\normalsize\color{ReportMuted}\raggedright\ReportDate\par}
+    \vfill
+  \end{titlepage}
+}

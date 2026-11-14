@@ -25,7 +25,7 @@
    "code": "src/hashatlas/evaluate.py, clusters.py, rules.py", "report_sections": "8-10",
    "short_role": "Evaluation and pattern mining", "short": ["Sealed test, bootstrap", "Eras and pool families", "Apriori rules"]},
   {"key": "M4", "name": "Member 4", "student_id": "[student ID]", "role": "Decision support, Future Lab and web dashboard",
-   "contributions": ["Built the miner advisor (pool vs solo vs do not mine across 26 countries) and the Unknown-block attribution",
+   "contributions": ["Built the miner advisor (pool vs solo vs do not mine across 27 economies) and the Unknown-block attribution",
                      "Built the Future Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and the historical backtest",
                      "Built and deployed the interactive dashboard (React, TypeScript, ECharts) and prepared the live demo"],
    "code": "src/hashatlas/decide.py, future.py, predict.py, webdata.py; web/", "report_sections": "11-12",

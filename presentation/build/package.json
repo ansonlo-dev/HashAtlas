@@ -1,0 +1,8 @@
+{
+  "name": "hashatlas-presentation-build",
+  "private": true,
+  "type": "commonjs",
+  "description": "Generates presentation/HashAtlas.pptx from pipeline outputs",
+  "scripts": { "build": "node build_deck.js" },
+  "dependencies": { "pptxgenjs": "4.0.1" }
+}

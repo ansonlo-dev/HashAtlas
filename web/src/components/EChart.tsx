@@ -72,6 +72,15 @@ export function EChart({ title, option, height = 300, ariaLabel, caption, table,
   }, []);
 
   useEffect(() => {
+    // ECharts reads legend colours from itemStyle, even for line-only series.
+    const o = option as { series?: Record<string, unknown>[] };
+    if (Array.isArray(o.series)) {
+      o.series = o.series.map((sr) => {
+        const lc = (sr.lineStyle as { color?: unknown } | undefined)?.color;
+        const ic = (sr.itemStyle as { color?: unknown } | undefined)?.color;
+        return lc && !ic ? { ...sr, itemStyle: { ...(sr.itemStyle as object), color: lc } } : sr;
+      });
+    }
     inst.current?.setOption({ animation: !reduceMotion, animationDuration: 700, animationEasing: "cubicOut",
       backgroundColor: "transparent", textStyle: { fontFamily: "Space Grotesk Variable, sans-serif", color: C.text2 },
       color: PALETTE, ...option }, true);
