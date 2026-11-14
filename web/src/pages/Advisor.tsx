@@ -37,7 +37,7 @@ export default function Advisor() {
       xAxis: { type: "category", data: ranked.map((e) => e.country), ...axis({ axisLabel: { color: C.text2, rotate: 60, fontSize: 10.5 } }) },
       yAxis: { type: "value", name: `${tariff} USD/kWh`, ...axis() },
       series: [{ type: "bar", data: ranked.map((e) => ({ value: e.p, itemStyle: {
-        color: e.country === country ? C.btc : e.p <= a.breakeven ? C.lime : e.asia ? C.cyan : "#475569",
+        color: e.country === country ? C.btc : e.p <= a.breakeven ? C.lime : e.asia ? C.cyan : "#cfc2ae",
         borderRadius: [4, 4, 0, 0], shadowBlur: e.country === country ? 16 : 0, shadowColor: C.btc } })),
         markLine: { symbol: "none", data: [{ yAxis: a.breakeven }], lineStyle: { color: C.magenta, width: 2, shadowBlur: 10, shadowColor: C.magenta },
           label: { formatter: `break-even ${usd(a.breakeven, 3)}`, color: C.magenta, position: "insideEndTop" } } }],

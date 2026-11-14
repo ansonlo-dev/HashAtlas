@@ -38,7 +38,7 @@ export default function Future() {
       series: [
         { name: "observed", type: "line", showSymbol: false, data: hist, lineStyle: glowLine(C.text, 1.4) },
         { name: "p10", type: "line", showSymbol: false, stack: "band", data: he.map((r) => [r.date, r.p10]), lineStyle: { opacity: 0 }, tooltip: { show: false } },
-        { name: "10–90% of paths", type: "line", showSymbol: false, stack: "band", data: he.map((r) => [r.date, r.p90 - r.p10]), lineStyle: { opacity: 0 }, areaStyle: { color: "rgba(167,139,250,0.20)" } },
+        { name: "10–90% of paths", type: "line", showSymbol: false, stack: "band", data: he.map((r) => [r.date, r.p90 - r.p10]), lineStyle: { opacity: 0 }, areaStyle: { color: "rgba(47,72,88,0.14)" } },
         { name: "median path", type: "line", showSymbol: false, data: he.map((r) => [r.date, r.p50]), lineStyle: glowLine(C.violet, 2.4),
           markLine: { symbol: "none", data: [{ xAxis: F.halving.date_p50 }], lineStyle: { color: C.btc, type: "dashed", width: 2 }, label: { formatter: "2028 halving (median)", color: C.btc } } },
         { name: `median (${F.sensitivity_method} window)`, type: "line", showSymbol: false, data: he.map((r) => [r.date, r.sensitivity_p50]), lineStyle: { color: C.magenta, type: "dashed", width: 1.6 } },
