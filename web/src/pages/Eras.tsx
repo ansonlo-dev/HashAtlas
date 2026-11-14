@@ -5,7 +5,7 @@ import { useData, type Dict, type WeekRow } from "../lib/data";
 import { fmt, int, pct } from "../lib/format";
 
 // Cluster colours deliberately differ from the hardware-era colours, so nobody reads a cluster as an era.
-const CL = ["#f472b6", "#2dd4bf", "#60a5fa", "#fde047", "#c084fc", "#fb7185", "#94a3b8", "#86efac"];
+const CL = ["#b4432f", "#1f7a6d", "#4c78a8", "#c9a227", "#7b4b94", "#d4793a", "#8a8580", "#7a9a62"];
 
 const FEAT_LABEL: Record<string, string> = {
   log_hashrate: "hash rate (log)", hashrate_growth_30d: "30-day growth", empty_share: "empty blocks", log_tx_per_block: "tx / block (log)",
@@ -25,7 +25,7 @@ export default function Eras() {
       pts.push({ value: [r.w, 0], itemStyle: { color: ERA_COLORS[r.era] } });
       pts.push({ value: [r.w, 1], itemStyle: { color: CL[r.km! % CL.length] } });
       pts.push({ value: [r.w, 2], itemStyle: { color: CL[((r.hw2 ?? 1) - 1) % CL.length] } });
-      pts.push({ value: [r.w, 3], itemStyle: { color: r.db === -1 ? "#ffffff" : CL[(r.db ?? 0) % CL.length], opacity: r.db === -1 ? 1 : 0.85 } });
+      pts.push({ value: [r.w, 3], itemStyle: { color: r.db === -1 ? "#1b1916" : CL[(r.db ?? 0) % CL.length], opacity: r.db === -1 ? 1 : 0.85 } });
     });
     const stripOpt = {
       tooltip: { ...tooltip({ trigger: "item" }), formatter: (p: Dict) => `${p.value[0]} · ${rows[p.value[1]]}` },
@@ -62,7 +62,7 @@ export default function Eras() {
     const dn = pf.average_dendrogram;
     const segs: Dict[] = (dn.icoord as number[][]).map((xs, i) => ({
       type: "line", data: xs.map((x2, k) => [x2, dn.dcoord[i][k]]), showSymbol: false, silent: true,
-      lineStyle: { color: Math.max(...dn.dcoord[i]) <= pf.family_cut_height ? C.cyan : "#64748b", width: 1.6,
+      lineStyle: { color: Math.max(...dn.dcoord[i]) <= pf.family_cut_height ? C.btc : "#a8a196", width: 1.6,
         shadowBlur: Math.max(...dn.dcoord[i]) <= pf.family_cut_height ? 8 : 0, shadowColor: C.cyan } }));
     const labels: string[] = dn.ivl;
     const dendroOpt = {

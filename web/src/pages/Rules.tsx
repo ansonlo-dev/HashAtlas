@@ -20,9 +20,9 @@ export default function Rules() {
       xAxis: { type: "log", name: "support", nameLocation: "middle", nameGap: 26, ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => pct(v, 1) } }) },
       yAxis: { type: "value", name: "confidence", min: Math.max(0, minConf - 0.05), max: 1, ...axis({ axisLabel: { color: C.muted, formatter: (v: number) => pct(v, 0) } }) },
       visualMap: { dimension: 2, min: 1, max: Math.max(2, ...rs.map((r) => r.lift)), right: 0, top: 10, itemHeight: 140, text: ["lift", ""], textStyle: { color: C.muted },
-        inRange: { color: ["#3b82f6", "#a78bfa", "#f472b6", "#f7931a"] }, calculable: true },
+        inRange: { color: ["#c9d3da", "#4c78a8", "#d4793a", "#a65400"] }, calculable: true },
       series: [{ type: "scatter", data: rs.map((r) => [r.support, r.confidence, r.lift, r.antecedent.length]),
-        symbolSize: (v: number[]) => 8 + v[3] * 5, itemStyle: { shadowBlur: 12, shadowColor: "rgba(247,147,26,.6)", opacity: 0.9 } }],
+        symbolSize: (v: number[]) => 8 + v[3] * 5, itemStyle: { borderColor: "#fffdf9", borderWidth: 1, opacity: 0.9 } }],
     };
     return { rs, opt };
   }, [data, minConf, minLift, cons, confirmedOnly]);
