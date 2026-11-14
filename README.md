@@ -101,5 +101,14 @@ is used. Outputs are historical analysis and scenarios, **not financial advice**
 
 ## Version control
 
-Every member commits their own work; the full history is kept (no fresh "clean" repository). The dashboard is
-deployed with Cloudflare Workers (`web/wrangler.jsonc`) at <https://cds3004.ansonlo.dev/>.
+The history includes centrally reconstructed source checkpoints labelled with the stage owners in
+`configs/team.json`. Their commit messages identify the original source versions and explain the date provenance.
+The original development history is preserved in the local history package. Individual participation needs each
+member's actual edits, reviews and exported agent sessions; the reconstructed checkpoints record assigned responsibility.
+
+The [14 October–14 November timeline](docs/project_timeline_plan.md) distinguishes the team's recalled milestones
+from the illustrative work plan. Reconstructed AuthorDate values refer to those milestones, with midnight as a
+placeholder for unknown times; CommitDate records the actual reconstruction. Source snapshot dates remain in
+the commit messages. These dates do not establish when a snapshot's individual files were written. Editorial
+changes with known creation dates retain those AuthorDate values.
+The dashboard is deployed with Cloudflare Workers (`web/wrangler.jsonc`) at <https://cds3004.ansonlo.dev/>.

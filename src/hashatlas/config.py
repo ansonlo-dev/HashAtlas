@@ -1,4 +1,4 @@
-"""Configuration, project paths and small JSON helpers (single source of truth: configs/config.yaml)."""
+"""Read project settings, resolve data paths and serialise artifact values."""
 from __future__ import annotations
 
 import json

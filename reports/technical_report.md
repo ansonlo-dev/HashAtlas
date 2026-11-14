@@ -8,14 +8,13 @@ date: "CDS3004 Data Mining, Lingnan University, 2026/27 Term 1 · 14 November 20
 # 1. Introduction
 
 In January 2009 anyone with a laptop could mine Bitcoin. Seventeen years later the network computes about
-1,032 exahashes per second, block production is dominated by industrial pools, and yet every few
-weeks a news story reports that a hobbyist with a single small device has "won the lottery" and mined a whole block
-on their own. **Can a small miner still win?** And if you live in Hong Kong or elsewhere in Asia, what should you
-actually do with a mining device: join a pool, mine solo as a lottery ticket, or switch it off?
+1,032 exahashes per second. Industrial pools dominate block production. Occasional solo successes are still described as having "won the lottery".
+We examine the odds and costs behind those successes for a miner in Hong Kong or elsewhere in Asia:
+joining a pool, mining solo, or switching the device off.
 
-This project answers these questions with data mining on the complete Bitcoin block history: **975,494
+We analyse the complete Bitcoin block history: **975,494
 blocks** from the genesis block (3 January 2009) to height 975,493 (2026-11-11),
-labelled with the entity that mined each one. We combine three complementary techniques, each matched to a question:
+labelled with the entity that mined each one. Each of the three techniques addresses a different question:
 
 * **Classification** (decision tree, KNN, SVM): can the *behavioural fingerprint* a miner leaves in a block (version-bit
   rolling, nonce bits, timestamps, how the block is filled) reveal who mined it, without reading the miner's name?
@@ -23,9 +22,9 @@ labelled with the entity that mined each one. We combine three complementary tec
   mining on their own, and which pools build their blocks in the same way?
 * **Association rules** (Apriori, implemented from scratch): which block properties co-occur with which miners?
 
-The models are then **applied to new examples**: blocks with no pool tag, blocks mined after our data freeze, and
-miner set-ups in 27 economies. A limited **Future Lab** explores what the 2028 halving means for small miners, with a
-backtest that shows how far such projections can be trusted. An interactive dashboard presents every result:
+We apply the models to blocks with no pool tag, blocks mined after our data freeze, and
+miner set-ups in 27 economies. The Future Lab models the 2028 halving under stated assumptions and reports its
+historical backtest error. Results and model traces are available in the interactive dashboard:
 <https://cds3004.ansonlo.dev/>.
 
 The rest of the report follows the course's six-step data-mining workflow: problem (section 2), design (3), data (4),
@@ -46,7 +45,7 @@ communication, ethics and agent use (14-16). Each member's contributions are lis
 
 | ID | Question | Technique | Success criterion (set before testing) |
 |---|---|---|---|
-| Q1 | From a block's fingerprint alone, which mining entity produced it? Can solo blocks be spotted? | Classification | Clearly beat majority / random / one-split baselines on an out-of-time test; report per-class results and the Solo class honestly |
+| Q1 | From a block's fingerprint alone, which mining entity produced it? Can solo blocks be spotted? | Classification | Clearly beat majority / random / one-split baselines on an out-of-time test; report per-class results and Solo-class limitations |
 | Q2a | Do the data rediscover the hardware eras without being told? | Clustering | Adjusted Rand index (ARI) against the documented eras clearly above 0; contiguous eras |
 | Q2b | Which pools build blocks alike? | Clustering + rules | Families that are stable across linkages and consistent with the classifier's confusions |
 | Q3 | What should a miner in Hong Kong / Asia do, now and after the 2028 halving? | Decisions on new examples | Advice that follows from the data, with explicit odds and break-even prices; future scenarios with a published backtest error |
@@ -69,7 +68,7 @@ communication, ethics and agent use (14-16). Each member's contributions are lis
 
 | Alternative | Why not chosen |
 |---|---|
-| Predict the BTC price | Not a data-mining question about mining; prices are driven by external events; widely shown to be unreliable |
+| Predict the BTC price | Outside the mining questions studied here; price changes also depend on external events |
 | Identify pools by their coinbase tag | That is the *label*; a lookup table, not data mining, and fails exactly when a tag is absent or shared |
 | Transaction-level analysis (address clustering) | Billions of rows; out of scope for one term and raises re-identification concerns |
 | Deep learning on raw block bytes | Not interpretable, not taught in this course, and would hide *why* blocks are similar |
@@ -77,8 +76,7 @@ communication, ethics and agent use (14-16). Each member's contributions are lis
 
 # 3. Solution design
 
-The design uses **three observation units**, one per question, so that each technique works on data whose meaning
-fits it:
+The analysis uses **four observation units**, with the aggregation level chosen for each task:
 
 | Unit | Rows | Used for | Time meaning |
 |---|---:|---|---|
@@ -92,12 +90,13 @@ selection and training (frozen model choice) → sealed test → explanations �
 Lab → figures → web data → independent verification → report → notebook. Every stage writes its evidence to
 `artifacts/` and is reproducible from `configs/config.yaml` (random seed 3004).
 
-**What is new in this design.** (i) Fingerprints are learnt from *behaviour only*: the label source is excluded and the
-version and nonce fields are decomposed into bits because they are nominal bit fields, not quantities. (ii)
-Day-relative features remove market conditions so that only a miner's *policy* remains. (iii) Classification and
-clustering are joined: "template families" found by hierarchical clustering on training data explain the classifier's
-confusions and give a second, family-level evaluation. (iv) Decisions are made on genuinely new blocks mined *after*
-the analysis freeze, and the Future Lab backtests its own method.
+The label source is excluded from the fingerprint features. Version and nonce values are decomposed into bits,
+since their integer ordering has no useful measurement interpretation. Day-relative features compare a miner's
+behaviour with other blocks produced under the same market conditions.
+
+Hierarchical clustering on training data defines the "template families" used in the second, family-level
+evaluation. We also apply the frozen model to blocks mined after the analysis freeze and backtest the Future Lab
+method on historical periods.
 
 # 4. Data collection and preprocessing
 
@@ -112,7 +111,7 @@ the analysis freeze, and the Future Lab backtests its own method.
 | blockchain.com charts | Daily hash rate, price, miner revenue, fees since 2009 | 6,519 days |
 | GlobalPetrolPrices (dated snapshot) | Household and business electricity prices, USD/kWh | 144 countries |
 
-**Loading a large dataset.** The ~4,000 daily dump files are read in parallel with explicit dtypes and only the needed
+**Acquisition and storage.** The ~4,000 daily dump files are read in parallel with explicit dtypes and only the needed
 columns, concatenated (about one million rows), de-duplicated by height and stored as Parquet. Every raw file has a
 SHA-256 hash in `artifacts/source_manifest.json`; downloads resume and retry with back-off. Mid-way through, the free
 Blockchair dump quota was exhausted (HTTP 402), so from 2019 onwards every block was fetched from mempool.space per
@@ -121,7 +120,7 @@ table has **no missing and no duplicate heights** (0 to 975,493).
 
 ## Attribute types
 
-Conceptual measurement scale is recorded separately from storage type (Lecture 2). Key decisions:
+The data dictionary distinguishes measurement scale from storage type (Lecture 2):
 
 * `version` and `nonce` are stored as integers but are **nominal bit fields**: bit 13 being set says something about
   the miner's software; "version = 0x2FFFE000 is larger than 0x20000000" says nothing. They are decomposed into bits.
@@ -145,10 +144,10 @@ Conceptual measurement scale is recorded separately from storage type (Lecture 2
 
 ## Label quality audit
 
-Labels for 2019+ come from mempool.space's attribution (coinbase tags *and* payout addresses, curated). Labels for
-2009-2018 come from our own transparent labeller: the first matching coinbase tag from the same open definition
-file, then Blockchair's address-based guess. To measure how good our labeller is, we **re-applied it to all
-424,464 mempool.space-labelled blocks** and compared:
+For 2019+, we use mempool.space's curated attribution from coinbase tags and payout addresses. For
+2009-2018, our labeller uses the first matching coinbase tag from the same open definition
+file, then Blockchair's address-based guess. We audited this labeller by applying it to all
+424,464 mempool.space-labelled blocks and comparing the labels:
 
 * when our labeller finds a tag, it agrees with mempool.space **99.95%** of the time;
 * it finds a tag for 92.6% of blocks; the rest are mainly pools identified only by payout
@@ -180,23 +179,23 @@ for every miner in the same period). An automated check confirms none of them re
 
 # 6. Feature selection
 
-Feature selection used **training data only** (2019-2023, month-stratified sample of 60,001
-blocks) and four complementary methods, from filter to wrapper:
+Selection was restricted to the training period (2019-2023, month-stratified sample of 60,001
+blocks). Filtering precedes the wrapper stage:
 
 | Step | Method | Removed | Remaining |
 | ---: | :--- | :--- | ---: |
 | 0 | Candidate fingerprint features | – | 77 |
 | 1 | Variance filter (min-max scaled variance < 1e-4) | 0 | 77 |
 | 2 | Mutual information vs. 10 random noise probes (cutoff 0.00019) | 19 | 58 |
-| 3 | Redundancy: |Spearman ρ| > 0.90, keep higher MI | 2 | 56 |
+| 3 | Redundancy: \|Spearman ρ\| > 0.90, keep higher MI | 2 | 56 |
 | 4 | Wrapper: drop-one-group ablation (tree, month-grouped CV) | fee ladder (percentiles), hour of day (control) | 51 |
 
-Findings worth noting:
+The selection results were:
 
-* **Timing carries no miner signal.** Both timestamp features (offset from the median of the previous 11 blocks and
+* **Timestamp features were removed.** Both features (offset from the median of the previous 11 blocks and
   interval since the previous block) scored below the noise probes and were removed, consistent with block discovery
   being a random (Poisson) process for every miner.
-* **The control feature was caught**: the hour-of-day encodings were removed (one by mutual information, the other by
+* **Hour-of-day controls.** The encodings were removed (one by mutual information, the other by
   the ablation), as designed.
 * Most nonce bits are noise; a few low-order bits survive (some mining hardware searches the nonce space in a
   structured way).
@@ -230,10 +229,9 @@ for fitting.
 | Test (sealed) | 2025-04-01 → 2026-10-31 | 83,387 | 34 | scored once, after the choice was frozen |
 | New | 2026-11-01 → 2026-11-11 | 1,446 | 3 | mined after the data freeze: decision demo |
 
-**Cross-validation adapted to time.** Shuffled k-fold would put blocks from the same day in both training and
-validation folds and overstate accuracy. Folds are therefore **grouped by calendar month** (5-fold GroupKFold). The
-training sample keeps every Solo block and a month-stratified proportional sample of the rest (representative
-sampling, Lecture 3).
+We use 5-fold GroupKFold with calendar month as the group. This keeps blocks from the same day out of opposing
+training and validation folds, unlike shuffled k-fold. The training sample retains every Solo block and samples
+the remaining blocks in proportion within each month (representative sampling, Lecture 3).
 
 ## Algorithms and hyper-parameters
 
@@ -246,8 +244,8 @@ sampling, Lecture 3).
 
 The SVMs are trained on a bounded sample because kernel SVM cost grows roughly quadratically with rows; all models
 are scored on identical validation and test blocks. **Nested cross-validation** (outer 5 × inner 3, month-grouped)
-estimates the *whole* tree-tuning procedure without optimistic bias: macro-F1 **0.378 ± 0.021**
-(SD over outer folds), close to the inner CV score, so the grid search did not overfit its own folds.
+evaluates the tree-tuning procedure outside its inner search folds: macro-F1 **0.378 ± 0.021**
+(SD over outer folds). Its mean is close to the inner CV score; this comparison does not by itself rule out overfitting.
 
 ![Tree complexity: training macro-F1 keeps rising with depth while held-out CV levels off, the classic overfitting signature.](figures/f06_tree_complexity.png)
 
@@ -295,23 +293,21 @@ counts as an error.
 
 ![Macro-F1 of every model on CV, validation and the sealed test (same features, same blocks); error bar = day-block bootstrap 95% interval.](figures/f07_model_comparison.png)
 
-**Reading the numbers.** The decision tree is clearly the best model: its macro-F1 is
+The decision tree has the highest test macro-F1:
 3.0× the stratified-random baseline and
-3.9× a one-split tree. KNN and both SVMs also beat all three baselines, by smaller margins.
-Exact-pool accuracy is modest (42% across 12 classes, against 18% for always
-predicting the largest pool), but the **true pool is among the tree's top three candidates 69%** of
-the time. In other words, behaviour narrows a block down to a few look-alike pools; it cannot reliably separate pools
-that build blocks the same way. Merging the template families fixed on training data raises accuracy only to
+3.9× a one-split tree. The strongest baseline matches or exceeds Linear SVM in macro-F1.
+Exact-pool accuracy is 42% across 12 classes, against 18% for always
+predicting the largest pool. The **true pool is among the tree's top three candidates 69%** of
+the time. Behaviour narrows the candidates but leaves pools with similar block templates difficult to separate.
+Merging the template families fixed on training data raises accuracy to
 46%, because those families were defined from average profiles, while the confusions below are
 spread across many large pools.
 
-**Why the tree and not KNN or SVM?** The signal sits in a few *discrete* bit patterns (signal bits set, how many
-version bits are rolled) and in thresholds on block composition. Axis-aligned tree splits isolate exactly these
-patterns. Distance- and kernel-based models weigh all 51 standardised features together, so a handful of
-informative bits is drowned by many weakly informative ones (the curse of dimensionality discussed in Lecture 7). We
-tested remedies on validation data — only the top-k mutual-information features, and mutual-information-weighted
-distances — and neither lifted KNN or the RBF SVM above about 0.11 macro-F1. The model comparison therefore teaches
-something about the data: its geometry favours rule-like models.
+The tree uses axis-aligned splits on discrete bit patterns (signal bits set, how many
+version bits are rolled) and block-composition thresholds. Distance- and kernel-based models weigh all 51 standardised features together, so many weakly informative features can dilute the contribution of a few
+informative bits (the curse of dimensionality discussed in Lecture 7). On validation data, we tested the top-k mutual-information features and mutual-information-weighted distances.
+Neither lifted KNN or the RBF SVM above about 0.11 macro-F1. These results favour the tree's threshold-based
+representation for the features used here.
 
 ![Test-period confusion matrix, row-normalised (diagonal = recall).](figures/f08_confusion.png)
 
@@ -330,9 +326,9 @@ something about the data: its geometry favours rule-like models.
 | Other pools | 0.45 | 0.23 | 0.31 | 21,634 |
 | Solo | 0.04 | 0.29 | 0.06 | 34 |
 
-The validation-to-test difference and the monthly scores (dashboard, Block Radar) show **drift**: pools change firmware
-and policies, and new pools appear. The pools that did not exist (or were small) during training are mapped by the
-frozen model as follows, a direct test of "whose template does a newcomer use?":
+The validation-to-test difference and the monthly scores in Block Radar are consistent with drift in pool firmware,
+policies and membership. The table below records how the frozen model classifies pools that were absent or small
+during training; these predictions describe fingerprint similarity.
 
 | Newcomer pool | Blocks (val+test) | Most often predicted as | Share |
 | :--- | ---: | :--- | ---: |
@@ -347,12 +343,12 @@ frozen model as follows, a direct test of "whose template does a newcomer use?":
 
 ## The Solo class
 
-Solo blocks are a needle in a haystack (base rate 0.041% of test blocks). One-vs-rest
-**average precision** is the honest metric here (ROC-AUC looks good for any rare class). The threshold frozen on
+The Solo-class base rate is 0.041% of test blocks. We report one-vs-rest average precision alongside ROC-AUC to describe performance on this rare class.
+The threshold frozen on
 validation (highest recall with precision >= 0.5 on validation) flagged 282 test blocks, of which 10
 were solo (precision 4%, recall 29% of 34). With so few
-solo blocks per year these figures carry wide uncertainty; the finding is that **modern solo blocks are mostly built
-with the same open-source templates as pool blocks** (section 10.3), so they are hard to fingerprint.
+solo blocks per year, uncertainty is substantial. The weak separation is consistent with modern solo and pool blocks
+using similar open-source templates (section 10.3).
 
 ![Solo vs rest on the test period: ROC (left) and precision-recall (right). SVM scores are decision values, not probabilities.](figures/f09_solo_roc_pr.png)
 
@@ -363,10 +359,10 @@ Permutation importance on the test period (drop in macro-F1 when one feature is 
 to that day dominate; fee features matter less because, since 2023, most pools fill blocks with the same fee-maximising
 template (section 10).
 
-**KNN, opened up.** For the latest solo test block (#973,413), the 41 nearest training blocks
-(euclidean distance, distance weights, standardised features) voted
+**KNN neighbours.** For the latest solo test block (#973,413), the 41 nearest training blocks
+(euclidean distance, distance weights, standardised features), the largest vote counts were
 AntPool: 9, Foundry USA: 8, Binance Pool: 8, ViaBTC: 6, so KNN predicted **AntPool**,
-a concrete illustration of why solo blocks are hard: their nearest neighbours are ordinary pool blocks.
+illustrating the overlap between this Solo example and pool blocks in the selected feature space.
 
 ![Permutation importance of the operational model on the test period.](figures/f10_permutation_importance.png)
 
@@ -389,13 +385,12 @@ scikit-learn within 2.8e-15). Stability across 10 seeds: mean ARI
 | C1 | 179 | 2011-06-13 | 2014-12-29 | ASIC |
 | C2 | 624 | 2014-11-10 | 2026-10-26 | Industrial ASIC |
 
-**Without being told anything about hardware, the clusters line up with the documented eras**: K-means ARI
+Hardware-era labels were used for comparison after fitting. The resulting K-means ARI is
 **0.71**, Ward linkage ARI **0.89**. K-means places the start of the
 industrial regime in 2014-11, when pools
 had taken over and blocks had become full, rather than at the first ASIC in January 2013; Ward linkage's boundaries fall on
 2011-06-13 and 2016-07-11, i.e. two weeks after the documented start of the FPGA era (1 June 2011) and two days after
-the July 2016 halving that coincided with the industrial-ASIC (Antminer S9) era. Both are useful refinements
-of a timeline that textbooks usually date by hardware releases alone.
+the July 2016 halving that coincided with the industrial-ASIC (Antminer S9) era. These boundaries describe changes in block production alongside the hardware release dates.
 
 | Linkage | Cophenetic correlation | Cluster sizes (cut at K) | ARI vs K-means | ARI vs eras |
 | :--- | ---: | :--- | ---: | ---: |
@@ -409,8 +404,8 @@ Single linkage chains almost everything into one cluster (its known weakness); a
 gives compact eras closest to history. **DBSCAN** (MinPts 20, eps
 1.27 from the 0.9 quantile of the k-distance curve) finds
 2 dense regions and labels 4.5% of weeks as noise: the
-transition weeks where hash rate and block composition were changing fastest. Density-based clustering is the wrong
-tool for separating eras that blend into each other, and that is itself a finding.
+transition weeks where hash rate and block composition were changing fastest. Here DBSCAN separates dense regions
+and transition weeks, rather than producing the compact era partition obtained with Ward linkage.
 
 ![Weekly cluster assignments compared with the documented hardware eras (black = DBSCAN noise).](figures/f13_eras_timeline.png)
 
@@ -424,15 +419,14 @@ Cutting below the 35th percentile of merge heights gives these multi-pool famili
 
 ![Average-linkage dendrogram of pool fingerprint profiles (2024-2026); the dashed line is the family cut.](figures/f14_pool_dendrogram.png)
 
-The families largely agree with the classifier: pools that are rare or absent in training are mostly read as an existing pool with a similar fingerprint (SECPOOL → AntPool 67%; Luxor → AntPool 53%; SBI Crypto → Other pools 66%; WhitePool → Foundry USA 49%), and Luxor is read as AntPool, which the dendrogram places in the same family. This matters for decentralisation: block production
-that looks spread over many pool names may come from fewer distinct block-building set-ups. Similar fingerprints can
-also come from shared mining firmware or pool software, so the data **suggest**, but do not prove, common control.
+The families largely agree with the classifier: pools that are rare or absent in training are mostly read as an existing pool with a similar fingerprint (SECPOOL → AntPool 67%; Luxor → AntPool 53%; SBI Crypto → Other pools 66%; WhitePool → Foundry USA 49%), and Luxor is read as AntPool, which the dendrogram places in the same family. Several pool names can therefore share a block-building fingerprint. Shared firmware or pool software is also a
+possible explanation; fingerprint similarity alone does not establish common control.
 
 ## Anomalous blocks
 
 DBSCAN on 6,000 recent blocks marks 1.5% as noise. Those blocks are
 65× more often empty than average and
-have unusual timestamps, which is genuine but rare miner behaviour, not data errors.
+have unusual timestamps. They were retained as rare observations.
 
 # 10. Association rules
 
@@ -461,8 +455,8 @@ items found the same 40 frequent itemsets with identical counts
 
 ## Rules "block properties → miner"
 
-With minimum confidence 30% (single pools have base rates of 1-30%, so this already implies
-lift > 1), 103 rules were found, and each was re-measured on the later window 2025-04-01 → 2026-11-01.
+With minimum confidence 30% (single pools have base rates of 1-30%; lift > 1
+identifies positive association), 103 rules were found, and each was re-measured on the later window 2025-04-01 → 2026-11-01.
 
 | Rule | Support | Confidence | Lift | Later confidence | Confirmed |
 | :--- | ---: | ---: | ---: | ---: | :--- |
@@ -484,8 +478,8 @@ informative rules are the high-lift ones.
 
 ## Pool signatures and the solo contrast
 
-Small pools can never pass a global support threshold, so we also mined frequent itemsets **inside** each pool's blocks
-and compared their support with all other blocks (contrast mining):
+A global support threshold can exclude signatures of small pools. We therefore mined frequent itemsets within each
+pool and compared their support with all other blocks (contrast mining):
 
 | Pool | Signature itemset | In pool | Elsewhere | Ratio |
 | :--- | :--- | ---: | ---: | ---: |
@@ -498,12 +492,11 @@ and compared their support with all other blocks (contrast mining):
 | Foundry USA | fullness=full(>=98%) ∧ version=rolls 5-8 bits | 44% | 34.3% | 1.3× |
 | SECPOOL | fullness=full(>=98%) ∧ version=rolls 1-4 bits | 45% | 35.1% | 1.3× |
 
-Pools with a strong signature (signal bits, distinctive version rolling) are exactly the ones the classifier recognises
-best. The large pools (AntPool, F2Pool, Luxor, SpiderPool) have **no distinctive itemset at
+The classifier performs best on pools with strong signal-bit or version-rolling signatures. The large pools (AntPool, F2Pool, Luxor, SpiderPool) have **no distinctive itemset at
 all**: they build blocks the way everybody else does. For the 85 solo blocks since 2019, the most
 over-represented itemset (txcount=below-day-median ∧ shape=consolidating) is only
-1.24× more common than among pool blocks, confirming that modern solo blocks are
-nearly indistinguishable from pool blocks.
+1.24× more common than among pool blocks. This small contrast is consistent with the weak separation of modern Solo
+and pool blocks.
 
 # 11. Decision making on new examples
 
@@ -513,18 +506,18 @@ In the last 12 months before the freeze, 92 of 52,360 blocks (0.18%) carried
 no attribution. The frozen model attributes them as Other pools: 68, Braiins Pool: 13, ViaBTC: 4, Foundry USA: 3.
 By pool *name*, **3 entities** mined more than half of the blocks (the Nakamoto coefficient). As
 an **upper-bound scenario**, if every fingerprint family of section 9.2 were a single block builder, the number would
-be **1** (largest family: AntPool + Braiins Pool + Foundry USA + Luxor). Similarity is not proof of shared
-ownership (family merges come from fingerprint similarity (section 9), which suggests but does not prove common control; shared templates can also come from shared software or proxy arrangements), so the true figure lies between these two bounds; the point is that pool names alone
-cannot establish how decentralised block building is.
+be **1** (largest family: AntPool + Braiins Pool + Foundry USA + Luxor). The artifact records the qualification that family merges come from fingerprint similarity (section 9), which suggests but does not prove common control; shared templates can also come from shared software or proxy arrangements.
+These figures compare two grouping assumptions; pool names alone cannot establish the concentration of actual block
+builders.
 
 ![Concentration of block production by labelled pool name.](figures/f18_concentration.png)
 
 ## Blocks mined after the data freeze
 
-The 1,446 labelled blocks mined between 2026-11-01 and 2026-11-12 were never seen by any stage.
-The frozen model predicted their miner first; when the labels were revealed, **36.1%** were correct,
-below the test-period accuracy (42%): one more sign of drift, as pools such as SpiderPool keep growing
-after the training period. The command `uv run hashatlas predict --heights …` repeats this for any block.
+The 1,446 labelled blocks mined between 2026-11-01 and 2026-11-12 were held out from model fitting and selection.
+The frozen model predicted their miner before the labels were revealed; **36.1%** were correct,
+below the test-period accuracy (42%). This is consistent with drift after the training period,
+including the growth of pools such as SpiderPool. The command `uv run hashatlas predict --heights …` repeats this for any block.
 
 ## The miner advisor: pool, solo lottery, or switch off?
 
@@ -546,17 +539,17 @@ electricity in 6: Bhutan, Ethiopia, Paraguay, Indonesia, Vietnam, Kazakhstan.
 
 ![Business electricity price by economy against the Antminer S21 break-even price (teal = Asia).](figures/f16_advisor.png)
 
-**Decision.** In Hong Kong, at retail tariffs, mining for profit does not pay at the freeze-date hash price. A small
-home miner (1.2 TH/s) is a lottery ticket: odds of about **1 in 16,362 per year**, an
+At Hong Kong retail tariffs, the modeled pool income does not cover electricity at the freeze-date hash price.
+A small home miner (1.2 TH/s) has solo odds of about **1 in 16,362 per year**, an
 expected wait of 16,361 years, and it costs electricity every day it runs. The
-advisor recommends pool mining only where electricity is below the device's break-even price, and labels solo mining
-honestly as a lottery.
+advisor recommends pool mining where electricity is below the device's break-even price and presents solo mining as
+a low-probability outcome with ongoing electricity costs.
 
 ![Chance that a 1.2 TH/s miner finds at least one block in a year (left) and blocks actually won by solo services (right).](figures/f03_solo_odds.png)
 
 # 12. Future Lab: the 2028 halving (scenarios, not forecasts)
 
-**How much future, and how.** We include the future only where it can be grounded: (1) the protocol schedule is
+**Scenario assumptions.** The calculation uses the protocol schedule and historical growth resampling: (1) the protocol schedule is
 certain: the subsidy halves at height 1,050,000; (2) hash-rate growth is simulated by block-bootstrapping
 30-day stretches of historical daily growth (4,000 paths); (3) BTC price and fee share are **user-chosen
 scenarios**, never forecasts; (4) the method is **backtested** from four historical dates.
@@ -565,9 +558,9 @@ scenarios**, never forecasts; (4) the method is **backtested** from four histori
 * Backtest (16 origin/horizon cases): the 80% band contained the realised hash rate in **75%** of
   cases. Two resampling windows were compared by the declared rule "lower backtest error wins": mean |error| of the
   median path 50% (last 3 years) vs 72% (since
-  2017), so the last-3-years window drives the main scenario. **Honest limitation:** a naive "no growth" projection had
+  2017), so the last-3-years window drives the main scenario. The naive "no growth" baseline had
   a lower error (28%) over 2019-2025, so the median path should be read as one point in a wide
-  range, not as a prediction.
+  range conditional on the assumptions.
 
 ![Left: hash-rate scenarios to 2029 with the projected 2028 halving. Right: backtest error of the same method from past origins.](figures/f17_future.png)
 
@@ -583,27 +576,27 @@ scenarios**, never forecasts; (4) the method is **backtested** from four histori
 | Antminer S21 XP Hyd | one month after halving | 2028-05-07 | 0.042 (0.029-0.061) | 1 in 64 |
 | Antminer S21 XP Hyd | 2029-01-01 | 2029-01-01 | 0.036 (0.023-0.055) | 1 in 76 |
 
-At today's price and a 5% fee share, the halving cuts the break-even electricity price of every device by more than half
+At the recorded BTC price and a 5% fee share, the halving cuts the break-even electricity price of every device by more than half
 (Antminer S21: 0.082 → 0.029 USD/kWh).
 Break-even scales linearly with price, so even a doubled BTC price would only restore it to about
-0.058 USD/kWh. After 2028, mining is viable only at very cheap,
-mostly industrial or stranded power, consistent with how mining migrated after earlier halvings. The dashboard's
-Future Lab lets the reader test any price and fee scenario.
+0.058 USD/kWh. Under these assumptions, the post-2028 break-even prices require much cheaper electricity.
+The dashboard's Future Lab lets the reader vary the price and fee assumptions.
 
 # 13. Interpretation and critical evaluation
 
 **Q1: Can fingerprints identify the miner?** Partly. The decision tree clearly beats every baseline and puts the
 true pool in its top three 69% of the time; pools with distinctive version-bit habits or
-signalling are recognised well. Most large pools, however, build blocks the same way, so exact-pool accuracy is capped
-at about 42%. The cap is informative rather than a failure: contrast mining finds no distinctive
-signature for the largest pools, and newcomer pools are mapped onto existing templates. Modern solo blocks are largely
+signalling are recognised well. Most large pools, however, build blocks the same way, and exact-pool accuracy was
+about 42%. Contrast mining also finds no distinctive signature for the largest pools, and the classifier maps newcomer pools
+onto existing templates. Modern solo blocks are largely
 indistinguishable from pool blocks.
 
 **Q2: Eras and families.** The unsupervised eras match documented history (ARI 0.89 with
 Ward), and the pool families explain the classifier's confusions.
 
-**Q3: Should a small miner mine?** In Hong Kong, for profit, no; for fun, it is a lottery ticket with known odds. After
-the 2028 halving the economics tighten further for everyone.
+**Q3: Should a small miner mine?** At the Hong Kong tariffs in the snapshot, modeled revenue does not cover electricity.
+Solo mining remains a low-probability recreational choice. The 2028 halving lowers break-even electricity prices
+under the stated scenarios.
 
 **Limitations.** (1) Labels are self-declared and may be copied or shared; mempool.space's attribution is the
 reference for 2019+. (2) Fingerprints drift; the model is dated to its training period and must be retrained. (3)
@@ -620,14 +613,15 @@ backtest error is large. (7) Family similarity is not proof of common ownership.
   outputs are historical analysis and scenarios.
 * **Environment.** Break-even analysis shows why mining concentrates where power is cheap; the energy-efficiency
   frontier (J/TH) fell about a millionfold from CPUs to ASICs, but total consumption is outside our scope.
-* **Implications.** Pool names overstate decentralisation; regulators and analysts should look at *template* diversity.
-  For individuals in high-tariff economies like Hong Kong, home mining is entertainment, not income.
+* **Implications.** Pool names give an incomplete account of template diversity. The observed fingerprint families
+  provide an additional measure for decentralisation research. At the Hong Kong tariffs used here, home mining does
+  not cover electricity costs.
 
 # 15. AI-agent use and verification
 
-The team used AI coding agents (see `agent_trajectories/`) following the course's workflow: humans defined the
-problem and constraints; the agent proposed plans; humans reviewed them; the agent implemented; humans verified
-outputs; then revised. Examples where human review changed the agent's output:
+The team used AI coding agents (see `agent_trajectories/`) within the course's review workflow. Team members defined
+the problem and constraints, reviewed the proposed plans, and checked the generated code and outputs. The following
+corrections are recorded in the project:
 
 * An early class design scored macro-F1 over *all* classes, including pools that had stopped mining; reviewers changed
   it to classes present in the evaluation period (predicting a vanished pool is still an error).
@@ -666,29 +660,25 @@ force, impurity measures, miner economics and the bootstrap; the dashboard has i
 
 # 16. Conclusion
 
-A small Bitcoin miner can still win, but only as a lottery: the odds have fallen from near-certainty in 2009 to about
+For a small device, solo mining has become a low-probability outcome: the odds have fallen from near-certainty in 2009 to about
 1 in 16,362 per year for a 1.2 TH/s device today, and they will roughly halve again in value
-after April 2028. Data mining on 975,494 blocks shows *why* the industry looks the way it does: the eras are visible in
-the data, pool names hide fewer distinct block builders, and behavioural fingerprints narrow a block down to a few look-alike
-pools. Future work: per-transaction template features, Stratum V2 adoption (which lets miners build their
+after April 2028. The analysis of 975,494 blocks identifies era changes and groups of similar block templates.
+Fingerprint classification narrows the candidate pools, with substantial overlap between several pools.
+Further work could examine per-transaction template features, Stratum V2 adoption (which lets miners build their
 own templates and may change fingerprints), and live retraining.
 
 # 17. Team members and contributions
 
-Each member was primarily responsible for specific components of the project while maintaining continuous
-collaboration and consultation throughout development. The workload was distributed as evenly as possible across the
-group, with the captain undertaking a slightly larger share of the core technical implementation, system integration,
-deployment, and final production tasks.
+The table below records the team's assigned responsibilities. The captain also handles integration, deployment
+and final production. This allocation links each stage to the code and deliverables that its owner is responsible
+for reviewing.
 
-Responsibilities were divided by stage of the data-mining lifecycle rather than by deliverable, so that the same
-person owns a stage end to end: its code module, its page on the dashboard, its sections of this report, its slides
-in the presentation and its record of AI-agent use. This kept every part of the project traceable to one accountable
-owner, while the hand-over points between stages (the cleaned block table, the frozen feature list, the frozen model,
-the cluster and rule outputs, and the dashboard data export) were agreed jointly and reviewed by the next owner in the
-pipeline before work continued.
+Each stage owner covers the corresponding code module, dashboard page, report sections, presentation slides and
+record of AI-agent use. The hand-over artifacts are the cleaned block table, frozen feature list and model,
+cluster and rule outputs, and dashboard data export.
 
 
-| Member | Role (report sections) | Contributions and code |
+| Member | Role (report sections) | Assigned contributions and code |
 | :--- | :--- | :--- |
 | LO Chi Kong (4672784) | Captain: problem definition, data engineering, integration and delivery (§1-4, 16-18 (and final compilation)) | Defined the miner-decision problem, users, constraints and alternative solutions; Built acquisition of 6,500+ daily block dumps, pool definitions, solo lists, network charts and electricity prices with SHA-256 provenance; Cleaned and labelled 975k blocks; wrote the data dictionary, quality checks and label audit; Integrated the pipeline (configuration, CLI, run-all), the report build, the dashboard shell and theme, deployment and the introduction video; compiled the final report and submission. Code: `src/hashatlas/config.py, cli.py, acquire.py, clean.py, report.py; configs/; web/src/App.tsx, styles.css, pages/Overview.tsx, pages/Methods.tsx; presentation/video/` |
 | POON Tsz Chun ([student ID]) | Feature transformation, feature selection and model learning (§5-7) | Designed the fingerprint features (version/nonce bit decomposition, body ratios, day-relative policy) and the leakage exclusions; Ran feature selection: variance filter, mutual information against noise probes, Spearman redundancy and group ablation; Tuned the decision tree, KNN and linear/RBF SVM with month-grouped and nested cross-validation; froze the model choice before testing. Code: `src/hashatlas/features.py, train.py; web/src/pages/Simulator.tsx, lib/tree.ts` |
@@ -707,11 +697,11 @@ pipeline before work continued.
 | LO Ka Hung | Miner Advisor, Future Lab | Miner advisor, live demo, Future Lab |
 
 
-Collaboration did not stop at these boundaries. Problem framing, the choice of questions and the evaluation design
-were decided by the whole group; each owner's agent-generated code and results were checked by at least one other
-member before they were merged; and the conclusions, limitations and presentation were rehearsed and revised together.
-Each member's individual work is also visible in the Git history of the repository and in their own exported
-AI-agent trajectory (Section 15).
+The Git history was reconstructed centrally from recorded source snapshots and labelled with the assigned stage
+owners. Reconstructed author dates refer to the team's recalled milestones, with midnight standing for an unknown
+time of day; committer dates record the actual reconstruction. Source snapshot dates remain in the commit messages.
+Neither milestone dates nor responsibility labels establish when individual files were written or who wrote them.
+Individual review and agent use should be supported by each member's own exported AI-agent trajectory (Section 15).
 
 # 18. Reproducibility and references
 

@@ -19,7 +19,7 @@ export const C = {
   red: "#b4432f", amber: "#c9a227", teal: "#2a9d8f", text: "#1b1916", text2: "#4a453f", muted: "#776f65",
   grid: "rgba(27,25,22,0.08)", axis: "rgba(27,25,22,0.28)",
 };
-/** "Ledger" palette: Bitcoin orange first, then calm, well-separated colours that read on warm paper. */
+// Start each chart with Bitcoin orange.
 export const PALETTE = [C.btc, C.violet, C.cyan, C.magenta, C.blue, C.amber, "#7b4b94", "#7a9a62", C.teal, "#b9a68a", "#8a8580", "#d4793a"];
 export const ERA_COLORS: Record<string, string> = { CPU: "#a8a196", GPU: C.blue, "FPGA/early ASIC": "#7a9a62", ASIC: C.violet, "Industrial ASIC": C.btc };
 
@@ -34,8 +34,13 @@ export const tooltip = (extra: Record<string, unknown> = {}) => ({
   textStyle: { color: C.text, fontSize: 12 }, extraCssText: "border-radius: 4px; box-shadow: 0 6px 18px -8px rgba(27,25,22,.3);",
   ...extra,
 });
-export const legend = (extra: Record<string, unknown> = {}) => ({ textStyle: { color: C.text2, fontSize: 11.5 }, icon: "roundRect", itemWidth: 12, itemHeight: 8, ...extra });
-/** Kept for API compatibility: a plain line (no glow) in the light theme. */
+export const legend = (extra: Record<string, unknown> = {}) => ({
+  textStyle: { color: C.text2, fontSize: 11.5 },
+  icon: "roundRect",
+  itemWidth: 12,
+  itemHeight: 8,
+  ...extra,
+});
 export const glowLine = (color: string, width = 2) => ({ width, color });
 export const areaGrad = (color: string, a = 0.35) => ({
   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [

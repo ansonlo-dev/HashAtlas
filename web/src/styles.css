@@ -14,7 +14,7 @@
   --btc: #f7931a;
   --btc-deep: #a65400;
   --btc-tint: #fdeedb;
-  /* data colours (names kept from v1 so every page keeps working) */
+  /* Retain the colour variable names used by existing page components. */
   --cyan: #1f7a6d;      /* teal   */
   --violet: #2f4858;    /* slate  */
   --magenta: #b4432f;   /* brick  */

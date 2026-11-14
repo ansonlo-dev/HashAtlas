@@ -1,13 +1,8 @@
-"""Stage 2 - loading, cleaning, labelling and data-quality checks.
+"""Load block dumps and API responses into a common schema, then label and audit them.
 
-* Loads ~6,500 daily Blockchair dumps (every block since the genesis block) into one typed table.
-* Sets conceptual attribute types (nominal / ordinal / interval / ratio) in a data dictionary.
-* Derives the miner label from the coinbase tag (mempool.space open pool definitions), falls back to
-  Blockchair's address-based guess, and overrides with mempool.space's authoritative solo-service lists.
-* Audits the labels against an independent random sample of mempool.space attributions.
-* Records every quality issue (gaps, duplicates, missing values, out-of-order timestamps, noisy fields)
-  and how it is handled. Out-of-order timestamps are *real protocol behaviour*, not errors, and are kept.
-"""
+Coinbase tags, payout guesses and solo-service lists supply miner labels. Quality
+checks record gaps, duplicates and missing fields. Consensus-valid timestamp
+reversals are retained as observations."""
 from __future__ import annotations
 
 import re

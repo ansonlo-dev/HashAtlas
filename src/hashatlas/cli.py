@@ -1,4 +1,4 @@
-"""Command-line entry point: `uv run hashatlas <stage>` (see README for the stage order)."""
+"""Run individual pipeline stages or the ordered run-all workflow."""
 from __future__ import annotations
 
 import argparse

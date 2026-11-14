@@ -111,3 +111,41 @@ function Table(tbl)
     pandoc.RawBlock("latex", "\\end{" .. env .. "}"),
   }
 end
+
+-- Reserve space for a heading together with its first table or following text.
+-- References start together on a new page instead of leaving their final lines alone.
+function Pandoc(doc)
+  local out, i = {}, 1
+  while i <= #doc.blocks do
+    local block = doc.blocks[i]
+    if block.t == "Header" and block.level <= 2 then
+      local headings, j = { block }, i + 1
+      while doc.blocks[j] and doc.blocks[j].t == "Header" do
+        table.insert(headings, doc.blocks[j])
+        j = j + 1
+      end
+      local following = doc.blocks[j]
+      local lines = following and following.t == "RawBlock"
+        and following.text:match("^\\Needspace{([%d%.]+)\\baselineskip}")
+      if pandoc.utils.stringify(block.content):match("Reproducibility and references$") then
+        table.insert(out, pandoc.RawBlock("latex", "\\clearpage"))
+      else
+        local reserve = lines and tonumber(lines) + 2 * #headings or 3 + 2 * #headings
+        table.insert(out, pandoc.RawBlock("latex", string.format("\\Needspace{%.1f\\baselineskip}", reserve)))
+      end
+      for _, heading in ipairs(headings) do table.insert(out, heading) end
+      if lines then
+        local start = following.text:gsub("^\\Needspace{[%d%.]+\\baselineskip}", "", 1)
+        table.insert(out, pandoc.RawBlock("latex", start))
+        i = j + 1
+      else
+        i = j
+      end
+    else
+      table.insert(out, block)
+      i = i + 1
+    end
+  end
+  doc.blocks = out
+  return doc
+end

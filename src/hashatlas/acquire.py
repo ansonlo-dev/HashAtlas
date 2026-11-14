@@ -1,13 +1,7 @@
-"""Stage 1 - acquisition.
+"""Cache the block sources, pool definitions, network charts and electricity snapshots.
 
-Downloads, with retries, resumable caching and SHA-256 provenance:
-  * Blockchair daily block dumps (every Bitcoin block since 3 Jan 2009; ~6,500 gzip files),
-  * mempool.space mining-pool definitions (coinbase tags / payout addresses) and the pool list,
-  * mempool.space block lists of every solo-mining service (ground truth for the solo class),
-  * a random audit sample of mempool.space block attributions (to measure our own labelling accuracy),
-  * blockchain.com daily network charts (hash rate, difficulty, price, miner revenue, fees),
-  * a dated snapshot of household and business electricity prices by country (GlobalPetrolPrices).
-"""
+Downloads retry with back-off and reuse cached files. The source manifest records
+SHA-256 hashes so later stages can identify the inputs used by a run."""
 from __future__ import annotations
 
 import hashlib
@@ -60,7 +54,7 @@ def _get(s: requests.Session, url: str, tries: int = 5, timeout: int = 60, **kw)
     raise RuntimeError(f"GET failed after {tries} tries: {url}: {last!r}")
 
 
-# ------------------------------------------------------------------ block dumps
+# Block dumps
 def _days(first: str, last: str):
     d, end = date.fromisoformat(first), date.fromisoformat(last)
     while d <= end:
@@ -119,7 +113,7 @@ def fetch_block_dumps() -> dict:
             "combined_sha256": combined.hexdigest(), "seconds": round(time.time() - t0, 1)}
 
 
-# ------------------------------------------------------------------ mempool.space
+# Mempool.space
 def fetch_pool_definitions() -> dict:
     s = _session()
     c = cfg()["sources"]
@@ -263,7 +257,7 @@ def fetch_mempool_heights(heights: list[int]) -> dict:
     return {"gap_blocks": len(rows), "calls": calls}
 
 
-# ------------------------------------------------------------------ network charts and electricity
+# Network charts and electricity
 def fetch_charts() -> dict:
     s = _session()
     c = cfg()["sources"]
