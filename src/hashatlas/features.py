@@ -46,7 +46,8 @@ BLOCK_FEATURES_BASE = [
     *[f"nonce_b{b}" for b in range(32)],
     "ts_minus_median_s", "interval_prev_s", "log_tx_count", "is_empty", "fullness", "witness_tx_share",
     "witness_byte_share", "io_ratio", "avg_tx_vbytes", "log_fee_total", "log_fee_per_kwu", "fee_share",
-    "log_min_fee", "rel_fee_rate", "rel_min_fee", "rel_median_fee", "rel_tx_count", "rel_fullness",
+    "log_min_fee", "rel_fee_rate", "rel_min_fee", "rel_median_fee", "rel_fee_p10", "rel_fee_p25", "rel_fee_p75",
+    "rel_fee_p90", "fee_spread", "rel_tx_count", "rel_fullness",
     "hour_sin", "hour_cos",
 ]
 
@@ -83,9 +84,14 @@ def block_features(b: pd.DataFrame) -> pd.DataFrame:
     day = b["time"].dt.floor("D")
     for col, src in (("rel_fee_rate", b["fee_per_kwu"].fillna(0)), ("rel_tx_count", tx.astype(float)),
                      ("rel_fullness", f["fullness"]), ("rel_min_fee", fmin.clip(lower=0)),
-                     ("rel_median_fee", fmed.clip(lower=0))):
+                     ("rel_median_fee", fmed.clip(lower=0)),
+                     *[(f"rel_fee_p{q}", (b[f"fee_p{q}"] if f"fee_p{q}" in b else pd.Series(np.nan, index=b.index)).clip(lower=0))
+                       for q in (10, 25, 75, 90)]):
         med = src.groupby(day).transform("median")
         f[col] = np.log1p(src) - np.log1p(med)
+    p10 = b["fee_p10"] if "fee_p10" in b else pd.Series(np.nan, index=b.index)
+    p90 = b["fee_p90"] if "fee_p90" in b else pd.Series(np.nan, index=b.index)
+    f["fee_spread"] = np.log1p(p90.clip(lower=0)) - np.log1p(p10.clip(lower=0))   # how wide the fee ladder is
     hour = b["time"].dt.hour + b["time"].dt.minute / 60
     f["hour_sin"] = np.sin(2 * np.pi * hour / 24)
     f["hour_cos"] = np.cos(2 * np.pi * hour / 24)
