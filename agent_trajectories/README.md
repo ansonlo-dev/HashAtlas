@@ -7,11 +7,11 @@ list every link.
 
 | Member | Agent / harness used | Share link(s) or exported file(s) | Rounds (approx.) | Main topics |
 |---|---|---|---|---|
-| Member 1 | _e.g. Claude Code_ | _add link or file_ | _n_ | problem definition, data sources, acquisition, cleaning, label audit |
-| Member 2 | _e.g. VS Code Copilot_ | _add link or file_ | _n_ | fingerprint features, feature selection, tree / KNN / SVM tuning |
-| Member 3 | _..._ | _add link or file_ | _n_ | sealed-test evaluation, K-means / hierarchical / DBSCAN, Apriori |
-| Member 4 | _..._ | _add link or file_ | _n_ | miner advisor, Future Lab, web dashboard, live demo |
-| Member 5 | _..._ | _add link or file_ | _n_ | verification checks, tests, ethics review, report and slides |
+| LO Chi Kong (captain) | _e.g. Claude Code_ | _add link or file_ | _n_ | problem definition, data acquisition, cleaning and label audit, integration, deployment, video |
+| POON Tsz Chun | _e.g. VS Code Copilot_ | _add link or file_ | _n_ | fingerprint features, leakage checks, feature selection, tree / KNN / SVM tuning, Fingerprint Lab |
+| SUBEDI Anukaran | _..._ | _add link or file_ | _n_ | sealed-test evaluation, bootstrap, explanations, predictions on new blocks, Block Radar |
+| YE Xiaochen | _..._ | _add link or file_ | _n_ | K-means / hierarchical / DBSCAN, Apriori and rules, independent verification, tests |
+| LO Ka Hung | _..._ | _add link or file_ | _n_ | miner advisor, Future Lab and backtest, dashboard data, ethics, live demo |
 
 Names must match `configs/team.json`.
 

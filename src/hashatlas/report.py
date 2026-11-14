@@ -617,7 +617,7 @@ Hong Kong business electricity costs {f(float(hk['price_usd_kwh'].iloc[0]), 3)} 
 **{f(s21_be, 3)} USD/kWh or less**. Among the {len(s21)} economies with business tariffs in our snapshot, the S21 covers its
 electricity in {len(viable)}: {', '.join(viable) if viable else 'none'}.
 
-{fig('f16_advisor', 'Business electricity price by economy against the Antminer S21 break-even price (cyan = Asia).')}
+{fig('f16_advisor', 'Business electricity price by economy against the Antminer S21 break-even price (teal = Asia).')}
 
 **Decision.** In Hong Kong, at retail tariffs, mining for profit does not pay at the freeze-date hash price. A small
 home miner (1.2 TH/s) is a lottery ticket: odds of about **{odds(float(bitaxe['solo_p_block_per_year']))} per year**, an
@@ -722,6 +722,18 @@ own templates and may change fingerprints), and live retraining.
 
 # 17. Team members and contributions
 
+Each member was primarily responsible for specific components of the project while maintaining continuous
+collaboration and consultation throughout development. The workload was distributed as evenly as possible across the
+group, with the captain undertaking a slightly larger share of the core technical implementation, system integration,
+deployment, and final production tasks.
+
+Responsibilities were divided by stage of the data-mining lifecycle rather than by deliverable, so that the same
+person owns a stage end to end: its code module, its page on the dashboard, its sections of this report, its slides
+in the presentation and its record of AI-agent use. This kept every part of the project traceable to one accountable
+owner, while the hand-over points between stages (the cleaned block table, the frozen feature list, the frozen model,
+the cluster and rule outputs, and the dashboard data export) were agreed jointly and reviewed by the next owner in the
+pipeline before work continued.
+
 ''')
     md.append(table(["Member", "Role (report sections)", "Contributions and code"],
                     [[m["name"] + (f" ({m['student_id']})" if m.get("student_id") else ""),
@@ -729,8 +741,17 @@ own templates and may change fingerprints), and live retraining.
                       "; ".join(m["contributions"]) + f". Code: `{m['code']}`"] for m in members], ["l", "l", "l"]))
     md.append(f'''
 
-All members took part in the topic choice, reviewed each other's agent-generated work, and rehearsed the presentation.
-Workload is also visible in the Git history and each member's agent trajectory.
+''')
+    md.append(table(["Member", "Dashboard page", "Slides presented"],
+                    [[m["name"] + (" (captain)" if m.get("captain") else ""), m.get("dashboard", ""), m.get("slides", "")] for m in members],
+                    ["l", "l", "l"]))
+    md.append(f'''
+
+Collaboration did not stop at these boundaries. Problem framing, the choice of questions and the evaluation design
+were decided by the whole group; each owner's agent-generated code and results were checked by at least one other
+member before they were merged; and the conclusions, limitations and presentation were rehearsed and revised together.
+Each member's individual work is also visible in the Git history of the repository and in their own exported
+AI-agent trajectory (Section 15).
 
 # 18. Reproducibility and references
 

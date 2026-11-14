@@ -1,0 +1,33 @@
+{
+  "voice": "en-US-SteffanNeural",
+  "rate": "-3%",
+  "target_s": 90,
+  "scenes": [
+    {"id": "genesis", "lines": [
+      "January the third, two thousand and nine.",
+      "The first Bitcoin block is mined, and an ordinary laptop is enough to win the reward."]},
+    {"id": "hashrate", "lines": [
+      "Seventeen years later, the network makes about a thousand quintillion guesses every second.",
+      "Laptops gave way to graphics cards, and then to warehouses of purpose-built chips."]},
+    {"id": "lottery", "lines": [
+      "For a small miner at home, the chance of winning a single block is now about one in sixteen thousand a year.",
+      "And yet, solo miners still won twenty-two blocks in twenty twenty-five."]},
+    {"id": "fingerprint", "lines": [
+      "Every block also carries a quiet fingerprint of whoever built it:",
+      "which header bits their machines roll, and how they fill the block."]},
+    {"id": "questions", "lines": [
+      "We mined all nine hundred and seventy-five thousand blocks to ask three questions.",
+      "Can behaviour alone reveal who mined a block?",
+      "Does the data rediscover the eras of mining?",
+      "And should a miner in Hong Kong join a pool, gamble solo, or switch off?"]},
+    {"id": "title", "lines": [
+      "This is HashAtlas."]}
+  ],
+  "captions": {
+    "January the third, two thousand and nine.": "3 January 2009.",
+    "Seventeen years later, the network makes about a thousand quintillion guesses every second.": "Seventeen years later, the network makes about a thousand quintillion (10²¹) guesses every second.",
+    "For a small miner at home, the chance of winning a single block is now about one in sixteen thousand a year.": "For a small miner at home, the chance of winning a single block is now about 1 in 16,000 a year.",
+    "And yet, solo miners still won twenty-two blocks in twenty twenty-five.": "And yet, solo miners still won 22 blocks in 2025.",
+    "We mined all nine hundred and seventy-five thousand blocks to ask three questions.": "We mined all 975,000 blocks to ask three questions."
+  }
+}

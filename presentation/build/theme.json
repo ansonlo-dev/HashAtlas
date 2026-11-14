@@ -1,19 +1,19 @@
 {
- "name": "HashAtlas Neon",
- "headFontFace": "Calibri",
+ "name": "HashAtlas Ledger",
+ "headFontFace": "Cambria",
  "bodyFontFace": "Calibri",
  "colors": {
-  "dk1": "070A1A",
+  "dk1": "1B1916",
   "lt1": "FFFFFF",
-  "dk2": "1A2150",
-  "lt2": "EAF0FF",
+  "dk2": "2F4858",
+  "lt2": "F6F2EA",
   "accent1": "F7931A",
-  "accent2": "A78BFA",
-  "accent3": "22D3EE",
-  "accent4": "F472B6",
-  "accent5": "A3E635",
-  "accent6": "60A5FA",
-  "hlink": "22D3EE",
-  "folHlink": "A78BFA"
+  "accent2": "2F4858",
+  "accent3": "1F7A6D",
+  "accent4": "B4432F",
+  "accent5": "4C78A8",
+  "accent6": "C9A227",
+  "hlink": "A65400",
+  "folHlink": "7B4B94"
  }
 }

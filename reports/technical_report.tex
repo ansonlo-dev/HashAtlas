@@ -191,9 +191,9 @@ Win?}
 fingerprints, mining eras, pool families and miner decisions across
 Asia}
 \newcommand{\ReportDate}{CDS3004 Data Mining, Lingnan University,
-2026/27 Term 1 · 13 November 2026}
-\newcommand{\ReportTeam}{Team HashAtlas · Member 1, Member 2, Member 3,
-Member 4, Member 5 · CRN 234}
+2026/27 Term 1 · 14 November 2026}
+\newcommand{\ReportTeam}{Team HashAtlas · LO Chi Kong, POON Tsz Chun,
+SUBEDI Anukaran, YE Xiaochen, LO Ka Hung · CRN 234}
 \newcommand{\ReportShortTitle}{HashAtlas · CDS3004 Group Project Report}
 \newcommand{\ReportKind}{CDS3004 Data Mining · Group Project Report}
 
@@ -1495,9 +1495,9 @@ Bhutan, Ethiopia, Paraguay, Indonesia, Vietnam, Kazakhstan.
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio,alt={Business electricity price by economy against the Antminer S21 break-even price (cyan = Asia).}]{figures/f16_advisor.png}}
+\pandocbounded{\includegraphics[keepaspectratio,alt={Business electricity price by economy against the Antminer S21 break-even price (teal = Asia).}]{figures/f16_advisor.png}}
 \caption{Business electricity price by economy against the Antminer S21
-break-even price (cyan = Asia).}
+break-even price (teal = Asia).}
 \end{figure}
 
 \textbf{Decision.} In Hong Kong, at retail tariffs, mining for profit
@@ -1747,12 +1747,29 @@ retraining.
 \section{Team members and
 contributions}\label{team-members-and-contributions}
 
+Each member was primarily responsible for specific components of the
+project while maintaining continuous collaboration and consultation
+throughout development. The workload was distributed as evenly as
+possible across the group, with the captain undertaking a slightly
+larger share of the core technical implementation, system integration,
+deployment, and final production tasks.
+
+Responsibilities were divided by stage of the data-mining lifecycle
+rather than by deliverable, so that the same person owns a stage end to
+end: its code module, its page on the dashboard, its sections of this
+report, its slides in the presentation and its record of AI-agent use.
+This kept every part of the project traceable to one accountable owner,
+while the hand-over points between stages (the cleaned block table, the
+frozen feature list, the frozen model, the cluster and rule outputs, and
+the dashboard data export) were agreed jointly and reviewed by the next
+owner in the pipeline before work continued.
+
 \Needspace{12.6\baselineskip}\begin{reporttable}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1843}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4046}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4110}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2101}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3878}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4021}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Member}
@@ -1765,47 +1782,94 @@ contributions}\label{team-members-and-contributions}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Member 1 ({[}student ID{]}) & Project lead: problem definition and data
-engineering (§1-4) & Defined the miner-decision problem, constraints and
-alternative solutions; Built acquisition of 6,500+ daily block dumps,
-pool definitions, solo lists, network charts and electricity prices with
-SHA-256 provenance; Cleaned and labelled 975k blocks, wrote the data
-dictionary, quality checks and label audit. Code:
-\code{src/\allowbreak{}hashatlas/\allowbreak{}acquire.\allowbreak{}py,\allowbreak{} clean.\allowbreak{}py; configs/\allowbreak{}config.\allowbreak{}yaml} \\
-Member 2 ({[}student ID{]}) & Feature engineering and classification
-(§5-7) & Designed fingerprint features (version/nonce bit decomposition,
-timing, day-relative policy) and the leakage exclusions; Ran feature
-selection (variance, mutual information vs noise probes, Spearman
-redundancy, group ablation); Tuned the decision tree, KNN and SVM with
-month-grouped CV and nested CV; froze the model choice. Code:
-\code{src/\allowbreak{}hashatlas/\allowbreak{}features.\allowbreak{}py,\allowbreak{} train.\allowbreak{}py,\allowbreak{} explain.\allowbreak{}py} \\
-Member 3 ({[}student ID{]}) & Evaluation and unsupervised mining (§8-10)
-& Evaluated the frozen models on the sealed 2025-26 test period
-(macro-F1, confusion, ROC/PR, day-block bootstrap, drift); Discovered
-mining eras with K-means, four hierarchical linkages and DBSCAN, and
-pool families by dendrogram; Implemented Apriori from scratch with
-brute-force verification, rule confirmation and the solo contrast. Code:
-\code{src/\allowbreak{}hashatlas/\allowbreak{}evaluate.\allowbreak{}py,\allowbreak{} clusters.\allowbreak{}py,\allowbreak{} rules.\allowbreak{}py} \\
-Member 4 ({[}student ID{]}) & Decision support, Future Lab and web
-dashboard (§11-12) & Built the miner advisor (pool vs solo vs do not
-mine across 27 economies) and the Unknown-block attribution; Built the
+LO Chi Kong (4672784) & Captain: problem definition, data engineering,
+integration and delivery (§1-4, 16-18 (and final compilation)) & Defined
+the miner-decision problem, users, constraints and alternative
+solutions; Built acquisition of 6,500+ daily block dumps, pool
+definitions, solo lists, network charts and electricity prices with
+SHA-256 provenance; Cleaned and labelled 975k blocks; wrote the data
+dictionary, quality checks and label audit; Integrated the pipeline
+(configuration, CLI, run-all), the report build, the dashboard shell and
+theme, deployment and the introduction video; compiled the final report
+and submission. Code:
+\code{src/\allowbreak{}hashatlas/\allowbreak{}config.\allowbreak{}py,\allowbreak{} cli.\allowbreak{}py,\allowbreak{} acquire.\allowbreak{}py,\allowbreak{} clean.\allowbreak{}py,\allowbreak{} report.\allowbreak{}py; configs/\allowbreak{}; web/\allowbreak{}src/\allowbreak{}App.\allowbreak{}tsx,\allowbreak{} styles.\allowbreak{}css,\allowbreak{} pages/\allowbreak{}Overview.\allowbreak{}tsx,\allowbreak{} pages/\allowbreak{}Methods.\allowbreak{}tsx; presentation/\allowbreak{}video/\allowbreak{}} \\
+POON Tsz Chun ({[}student ID{]}) & Feature transformation, feature
+selection and model learning (§5-7) & Designed the fingerprint features
+(version/nonce bit decomposition, body ratios, day-relative policy) and
+the leakage exclusions; Ran feature selection: variance filter, mutual
+information against noise probes, Spearman redundancy and group
+ablation; Tuned the decision tree, KNN and linear/RBF SVM with
+month-grouped and nested cross-validation; froze the model choice before
+testing. Code:
+\code{src/\allowbreak{}hashatlas/\allowbreak{}features.\allowbreak{}py,\allowbreak{} train.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Simulator.\allowbreak{}tsx,\allowbreak{} lib/\allowbreak{}tree.\allowbreak{}ts} \\
+SUBEDI Anukaran ({[}student ID{]}) & Performance evaluation, model
+explanation and decisions on new blocks (§8, 11 (unattributed and
+post-freeze blocks)) & Evaluated the frozen models on the sealed 2025-26
+test period: macro-F1, confusion, ROC/PR, day-block bootstrap and drift;
+Explained the tree (worked Gini split, permutation importance) and
+mapped newcomer pools to their nearest template; Applied the frozen
+model to unattributed blocks and to blocks mined after the data freeze;
+produced the report figures. Code:
+\code{src/\allowbreak{}hashatlas/\allowbreak{}evaluate.\allowbreak{}py,\allowbreak{} explain.\allowbreak{}py,\allowbreak{} predict.\allowbreak{}py,\allowbreak{} figures.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Radar.\allowbreak{}tsx} \\
+YE Xiaochen ({[}student ID{]}) & Clustering, association rules and
+independent verification (§9, 10, 13) & Rediscovered the mining eras
+with K-means, four hierarchical linkages and DBSCAN; built pool families
+by dendrogram; Implemented Apriori from scratch with brute-force
+verification, rule confirmation on a later window and the solo contrast;
+Wrote the independent verification checks and the unit-test suite; led
+the interpretation and limitations review. Code:
+\code{src/\allowbreak{}hashatlas/\allowbreak{}clusters.\allowbreak{}py,\allowbreak{} rules.\allowbreak{}py,\allowbreak{} verify.\allowbreak{}py; tests/\allowbreak{}; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Eras.\allowbreak{}tsx,\allowbreak{} Rules.\allowbreak{}tsx} \\
+LO Ka Hung ({[}student ID{]}) & Decision support, Future Lab, dashboard
+data and ethics (§11 (miner advisor), 12, 14) & Built the miner advisor:
+pool vs solo vs switch off across devices and 27 economies; Built the
 Future Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and
-the historical backtest; Built and deployed the interactive dashboard
-(React, TypeScript, ECharts) and prepared the live demo. Code:
-\code{src/\allowbreak{}hashatlas/\allowbreak{}decide.\allowbreak{}py,\allowbreak{} future.\allowbreak{}py,\allowbreak{} predict.\allowbreak{}py,\allowbreak{} webdata.\allowbreak{}py; web/\allowbreak{}} \\
-Member 5 ({[}student ID{]}) & Verification, ethics, AI-agent governance
-and reporting (§13-17) & Wrote the independent verification checks and
-the test suite; Led the ethics review and the AI-agent use and
-verification log; collected every member's trajectory; Edited the report
-and slides, and coordinated rehearsals. Code:
-\code{src/\allowbreak{}hashatlas/\allowbreak{}verify.\allowbreak{}py,\allowbreak{} report.\allowbreak{}py,\allowbreak{} figures.\allowbreak{}py; tests/\allowbreak{}; presentation/\allowbreak{}} \\
+the historical backtest; Exported the dashboard data, built the Advisor
+and Future Lab pages and ran the live demo; led the ethics review. Code:
+\code{src/\allowbreak{}hashatlas/\allowbreak{}decide.\allowbreak{}py,\allowbreak{} future.\allowbreak{}py,\allowbreak{} webdata.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Advisor.\allowbreak{}tsx,\allowbreak{} Future.\allowbreak{}tsx,\allowbreak{} lib/\allowbreak{}econ.\allowbreak{}ts} \\
 \end{longtable}
 
 \end{reporttable}
 
-All members took part in the topic choice, reviewed each other's
-agent-generated work, and rehearsed the presentation. Workload is also
-visible in the Git history and each member's agent trajectory.
+\Needspace{12.6\baselineskip}\begin{reporttable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1823}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3784}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4392}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Member}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Dashboard page}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Slides presented}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+LO Chi Kong (captain) & Overview, Methods \& Data, site shell and
+deployment & Title, introduction video, questions, problem, data,
+conclusion \\
+POON Tsz Chun & Fingerprint Lab & Features, feature selection,
+validation design \\
+SUBEDI Anukaran & Block Radar & Sealed-test results, confusion and
+newcomers, blocks after the freeze \\
+YE Xiaochen & Eras \& Families, Pattern Miner & Mining eras, pool
+families and rules, limits and verification \\
+LO Ka Hung & Miner Advisor, Future Lab & Miner advisor, live demo,
+Future Lab \\
+\end{longtable}
+
+\end{reporttable}
+
+Collaboration did not stop at these boundaries. Problem framing, the
+choice of questions and the evaluation design were decided by the whole
+group; each owner's agent-generated code and results were checked by at
+least one other member before they were merged; and the conclusions,
+limitations and presentation were rehearsed and revised together. Each
+member's individual work is also visible in the Git history of the
+repository and in their own exported AI-agent trajectory (Section 15).
 
 \section{Reproducibility and
 references}\label{reproducibility-and-references}

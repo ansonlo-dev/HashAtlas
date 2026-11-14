@@ -9,7 +9,7 @@ Live dashboard: <https://cds3004.ansonlo.dev/>.
 | Requirement | Where it is |
 |---|---|
 | Teams of 3-5 (CRN 234) | Five members, `configs/team.json` |
-| Workflow: real problem → data → techniques → evaluation → visualisation and interpretation → communication | Report sections 2-16; slides 1-16; dashboard |
+| Workflow: real problem → data → techniques → evaluation → visualisation and interpretation → communication | Report sections 2-16; slides 1-18 (incl. the intro video); dashboard |
 | "Impress me": interesting question + usable data + appropriate analysis | 975,494 real Bitcoin blocks; three questions matched to classification, clustering and association rules |
 | Hosted on GitHub; every member commits; full history kept | This repository; make it **public** before submission |
 | Presentation file (PPTX or PDF) | `presentation/HashAtlas.pptx`, `presentation/HashAtlas.pdf` |
@@ -23,12 +23,12 @@ Live dashboard: <https://cds3004.ansonlo.dev/>.
 
 | Criterion | Evidence |
 |---|---|
-| Problem definition: problem, constraints, alternatives | Report §2 (users, Q1-Q3 with success criteria, six constraints, five alternatives); slide 3 |
+| Problem definition: problem, constraints, alternatives | Report §2 (users, Q1-Q3 with success criteria, six constraints, five alternatives); slides 3-4 |
 | Solution design: related, innovative, clearly explained | Report §3 (three observation units, pipeline, four design innovations); slides 2, 5, 7 |
 | Data collection & preprocessing: collect, load large data, feature types, missing/noisy data | Report §4: ~975k blocks from four sources, parallel typed loading, data dictionary with conceptual scales, quality table (missing fields, out-of-order timestamps kept, empty blocks, gap filling), label audit on 424k blocks |
 | Feature selection | Report §6: variance filter, mutual information vs noise probes, Spearman redundancy, group ablation (wrapper); control feature removed as designed |
 | Feature transformation | Report §5: bit decomposition of nominal bit fields, log1p, ratios, day-relative policy features, cyclic encoding, standardisation in pipelines, weekly aggregation, break-even economics |
-| Data visualisation | 18 report figures (light) + dark versions in slides; interactive ECharts dashboard (8 pages) |
+| Data visualisation | 18 report figures + paper-toned versions in the slides; interactive ECharts dashboard (8 pages) |
 | Data-mining method usage | Decision tree, KNN, linear/RBF SVM; K-means, single/complete/average/Ward, DBSCAN; Apriori (from scratch) + contrast mining |
 | Model learning procedure | Grids, month-grouped CV, nested CV, complexity curve, worked Gini split, frozen model choice; report §7 |
 | Performance evaluation | Out-of-time validation and sealed test, baselines, macro-F1, balanced accuracy, top-3 and family accuracy, per-class table, ROC/PR, day-block bootstrap, drift; report §8 |
@@ -37,8 +37,8 @@ Live dashboard: <https://cds3004.ansonlo.dev/>.
 
 ### Presentation (8%)
 
-Time and pace: ~16-minute script (word-count timing per slide) (`presentation/timing_check.csv`); content organisation: one
-question per section, Q1-Q3 answered on the closing slide; tools: consistent dark theme, native charts, live demo
+Time and pace: 20-minute slot = 1:30 intro video + ~16:30 speaking (five presenters, 3:14–3:23 each) + ~2:00 buffer (word-count timing per slide) (`presentation/timing_check.csv`); content organisation: one
+question per section, Q1-Q3 answered on the closing slide; tools: one consistent "Ledger" theme (paper, ink, Bitcoin orange) shared by slides, video and dashboard, native charts, live demo
 with screenshot fallback; delivery, engagement, attire, speech: see `presentation/qa_and_presenter_preparation.md`.
 
 ## 3. Actions only the team can do before submission

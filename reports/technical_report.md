@@ -1,8 +1,8 @@
 ---
 title: "HashAtlas: Can a Small Bitcoin Miner Still Win?"
 subtitle: "Mining 975,494 Bitcoin blocks for miner fingerprints, mining eras, pool families and miner decisions across Asia"
-team: "Team HashAtlas · Member 1, Member 2, Member 3, Member 4, Member 5 · CRN 234"
-date: "CDS3004 Data Mining, Lingnan University, 2026/27 Term 1 · 13 November 2026"
+team: "Team HashAtlas · LO Chi Kong, POON Tsz Chun, SUBEDI Anukaran, YE Xiaochen, LO Ka Hung · CRN 234"
+date: "CDS3004 Data Mining, Lingnan University, 2026/27 Term 1 · 14 November 2026"
 ---
 
 # 1. Introduction
@@ -544,7 +544,7 @@ Hong Kong business electricity costs 0.175 USD/kWh; an Antminer S21 needs
 **0.089 USD/kWh or less**. Among the 26 economies with business tariffs in our snapshot, the S21 covers its
 electricity in 6: Bhutan, Ethiopia, Paraguay, Indonesia, Vietnam, Kazakhstan.
 
-![Business electricity price by economy against the Antminer S21 break-even price (cyan = Asia).](figures/f16_advisor.png)
+![Business electricity price by economy against the Antminer S21 break-even price (teal = Asia).](figures/f16_advisor.png)
 
 **Decision.** In Hong Kong, at retail tariffs, mining for profit does not pay at the freeze-date hash price. A small
 home miner (1.2 TH/s) is a lottery ticket: odds of about **1 in 16,362 per year**, an
@@ -675,18 +675,43 @@ own templates and may change fingerprints), and live retraining.
 
 # 17. Team members and contributions
 
+Each member was primarily responsible for specific components of the project while maintaining continuous
+collaboration and consultation throughout development. The workload was distributed as evenly as possible across the
+group, with the captain undertaking a slightly larger share of the core technical implementation, system integration,
+deployment, and final production tasks.
+
+Responsibilities were divided by stage of the data-mining lifecycle rather than by deliverable, so that the same
+person owns a stage end to end: its code module, its page on the dashboard, its sections of this report, its slides
+in the presentation and its record of AI-agent use. This kept every part of the project traceable to one accountable
+owner, while the hand-over points between stages (the cleaned block table, the frozen feature list, the frozen model,
+the cluster and rule outputs, and the dashboard data export) were agreed jointly and reviewed by the next owner in the
+pipeline before work continued.
+
 
 | Member | Role (report sections) | Contributions and code |
 | :--- | :--- | :--- |
-| Member 1 ([student ID]) | Project lead: problem definition and data engineering (§1-4) | Defined the miner-decision problem, constraints and alternative solutions; Built acquisition of 6,500+ daily block dumps, pool definitions, solo lists, network charts and electricity prices with SHA-256 provenance; Cleaned and labelled 975k blocks, wrote the data dictionary, quality checks and label audit. Code: `src/hashatlas/acquire.py, clean.py; configs/config.yaml` |
-| Member 2 ([student ID]) | Feature engineering and classification (§5-7) | Designed fingerprint features (version/nonce bit decomposition, timing, day-relative policy) and the leakage exclusions; Ran feature selection (variance, mutual information vs noise probes, Spearman redundancy, group ablation); Tuned the decision tree, KNN and SVM with month-grouped CV and nested CV; froze the model choice. Code: `src/hashatlas/features.py, train.py, explain.py` |
-| Member 3 ([student ID]) | Evaluation and unsupervised mining (§8-10) | Evaluated the frozen models on the sealed 2025-26 test period (macro-F1, confusion, ROC/PR, day-block bootstrap, drift); Discovered mining eras with K-means, four hierarchical linkages and DBSCAN, and pool families by dendrogram; Implemented Apriori from scratch with brute-force verification, rule confirmation and the solo contrast. Code: `src/hashatlas/evaluate.py, clusters.py, rules.py` |
-| Member 4 ([student ID]) | Decision support, Future Lab and web dashboard (§11-12) | Built the miner advisor (pool vs solo vs do not mine across 27 economies) and the Unknown-block attribution; Built the Future Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and the historical backtest; Built and deployed the interactive dashboard (React, TypeScript, ECharts) and prepared the live demo. Code: `src/hashatlas/decide.py, future.py, predict.py, webdata.py; web/` |
-| Member 5 ([student ID]) | Verification, ethics, AI-agent governance and reporting (§13-17) | Wrote the independent verification checks and the test suite; Led the ethics review and the AI-agent use and verification log; collected every member's trajectory; Edited the report and slides, and coordinated rehearsals. Code: `src/hashatlas/verify.py, report.py, figures.py; tests/; presentation/` |
+| LO Chi Kong (4672784) | Captain: problem definition, data engineering, integration and delivery (§1-4, 16-18 (and final compilation)) | Defined the miner-decision problem, users, constraints and alternative solutions; Built acquisition of 6,500+ daily block dumps, pool definitions, solo lists, network charts and electricity prices with SHA-256 provenance; Cleaned and labelled 975k blocks; wrote the data dictionary, quality checks and label audit; Integrated the pipeline (configuration, CLI, run-all), the report build, the dashboard shell and theme, deployment and the introduction video; compiled the final report and submission. Code: `src/hashatlas/config.py, cli.py, acquire.py, clean.py, report.py; configs/; web/src/App.tsx, styles.css, pages/Overview.tsx, pages/Methods.tsx; presentation/video/` |
+| POON Tsz Chun ([student ID]) | Feature transformation, feature selection and model learning (§5-7) | Designed the fingerprint features (version/nonce bit decomposition, body ratios, day-relative policy) and the leakage exclusions; Ran feature selection: variance filter, mutual information against noise probes, Spearman redundancy and group ablation; Tuned the decision tree, KNN and linear/RBF SVM with month-grouped and nested cross-validation; froze the model choice before testing. Code: `src/hashatlas/features.py, train.py; web/src/pages/Simulator.tsx, lib/tree.ts` |
+| SUBEDI Anukaran ([student ID]) | Performance evaluation, model explanation and decisions on new blocks (§8, 11 (unattributed and post-freeze blocks)) | Evaluated the frozen models on the sealed 2025-26 test period: macro-F1, confusion, ROC/PR, day-block bootstrap and drift; Explained the tree (worked Gini split, permutation importance) and mapped newcomer pools to their nearest template; Applied the frozen model to unattributed blocks and to blocks mined after the data freeze; produced the report figures. Code: `src/hashatlas/evaluate.py, explain.py, predict.py, figures.py; web/src/pages/Radar.tsx` |
+| YE Xiaochen ([student ID]) | Clustering, association rules and independent verification (§9, 10, 13) | Rediscovered the mining eras with K-means, four hierarchical linkages and DBSCAN; built pool families by dendrogram; Implemented Apriori from scratch with brute-force verification, rule confirmation on a later window and the solo contrast; Wrote the independent verification checks and the unit-test suite; led the interpretation and limitations review. Code: `src/hashatlas/clusters.py, rules.py, verify.py; tests/; web/src/pages/Eras.tsx, Rules.tsx` |
+| LO Ka Hung ([student ID]) | Decision support, Future Lab, dashboard data and ethics (§11 (miner advisor), 12, 14) | Built the miner advisor: pool vs solo vs switch off across devices and 27 economies; Built the Future Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and the historical backtest; Exported the dashboard data, built the Advisor and Future Lab pages and ran the live demo; led the ethics review. Code: `src/hashatlas/decide.py, future.py, webdata.py; web/src/pages/Advisor.tsx, Future.tsx, lib/econ.ts` |
 
 
-All members took part in the topic choice, reviewed each other's agent-generated work, and rehearsed the presentation.
-Workload is also visible in the Git history and each member's agent trajectory.
+
+| Member | Dashboard page | Slides presented |
+| :--- | :--- | :--- |
+| LO Chi Kong (captain) | Overview, Methods & Data, site shell and deployment | Title, introduction video, questions, problem, data, conclusion |
+| POON Tsz Chun | Fingerprint Lab | Features, feature selection, validation design |
+| SUBEDI Anukaran | Block Radar | Sealed-test results, confusion and newcomers, blocks after the freeze |
+| YE Xiaochen | Eras & Families, Pattern Miner | Mining eras, pool families and rules, limits and verification |
+| LO Ka Hung | Miner Advisor, Future Lab | Miner advisor, live demo, Future Lab |
+
+
+Collaboration did not stop at these boundaries. Problem framing, the choice of questions and the evaluation design
+were decided by the whole group; each owner's agent-generated code and results were checked by at least one other
+member before they were merged; and the conclusions, limitations and presentation were rehearsed and revised together.
+Each member's individual work is also visible in the Git history of the repository and in their own exported
+AI-agent trajectory (Section 15).
 
 # 18. Reproducibility and references
 

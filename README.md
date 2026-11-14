@@ -71,7 +71,7 @@ cd ../presentation/build && bun install && ./make.sh                            
 | `rules` | From-scratch Apriori with brute-force check, rules, later-window confirmation, pool signatures, solo contrast | `artifacts/rules.json` |
 | `decide` | Unknown-block attribution and concentration, post-freeze blocks, miner advisor | `artifacts/decisions.json` |
 | `future` | Hash-rate scenario paths, halving timing, device break-even, backtest of two resampling windows | `artifacts/future.json` |
-| `figures`, `webdata`, `verify`, `report`, `notebook` | Report/slide figures (light and dark), dashboard data, independent checks, report PDF, executed notebook | `reports/`, `web/public/data/`, `artifacts/verification.json`, `notebooks/` |
+| `figures`, `webdata`, `verify`, `report`, `notebook` | Report/slide figures (white and paper-toned), dashboard data, independent checks, report PDF, executed notebook | `reports/`, `web/public/data/`, `artifacts/verification.json`, `notebooks/` |
 
 **New examples:** `uv run hashatlas predict --heights 975400 975401` fingerprints blocks (prediction first, the
 revealed label separately); `uv run hashatlas predict --ths 200 --watts 3500 --country "Hong Kong"` gives miner advice.
