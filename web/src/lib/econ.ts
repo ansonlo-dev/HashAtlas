@@ -1,4 +1,4 @@
-/** Miner economics - the same formulas as src/hashatlas/decide.py (kept in sync by econ.test.ts). */
+/** Browser equivalents of decide.py; econ.test.ts checks the shared formulas. */
 export interface Device {
   name: string;
   ths: number;

@@ -1,4 +1,4 @@
-/** Loads the versioned static exports written by `uv run hashatlas webdata` (web/public/data/*.json). */
+/** Load the static JSON exports produced by `hashatlas webdata`. */
 import { useEffect, useState } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

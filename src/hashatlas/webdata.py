@@ -1,8 +1,7 @@
-"""Stage 12 - versioned static data for the web dashboard (web/public/data/*.json).
+"""Export versioned analysis data to web/public/data for the dashboard.
 
-The dashboard never recomputes models; it reads these exports. Light client-side arithmetic (miner economics,
-scenario hash price, decision-tree traversal) uses exactly the formulas and the fitted tree exported here.
-"""
+The browser consumes saved model results. Its economics, scenario-price and
+tree-traversal calculations use the formulas and tree exported here."""
 from __future__ import annotations
 
 from datetime import datetime, timezone

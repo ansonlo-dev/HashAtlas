@@ -1,12 +1,8 @@
-"""Stage 10 - Future Lab: scenario projections, not predictions (section 12).
+"""Simulate conditional hash-rate paths and backtest the resampling method.
 
-What is known for certain is the protocol schedule: the subsidy halves at height 1,050,000. Everything else is
-uncertain, so we (1) simulate network hash-rate paths by block-bootstrapping 30-day blocks of historical daily
-log-growth from the industrial-ASIC era, (2) convert each path into block timing (difficulty lags hash rate by
-about a week, so blocks arrive faster while hash rate grows) and hence a halving-date distribution, (3) treat the
-BTC price and the fee share as user-chosen scenarios instead of forecasting them, and (4) backtest the same
-projection method from four historical origins to report how wrong it would have been.
-"""
+The simulator resamples 30-day blocks of historical log growth. Price and fee
+share remain scenario inputs. The protocol halving height is fixed; its date,
+device break-even prices and solo odds vary across simulated paths."""
 from __future__ import annotations
 
 import numpy as np

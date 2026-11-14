@@ -1,12 +1,8 @@
-"""Stage 9 - decisions on new examples (section 11).
+"""Apply the frozen classifier and calculate device-level mining economics.
 
-1. Attribution of "Unknown" blocks with the frozen classifier, and its effect on the measured concentration
-   (Nakamoto coefficient = smallest number of entities controlling > 50% of blocks).
-2. Genuinely new blocks mined after the analysis freeze (1-11 Nov 2026): predicted miner vs the label revealed
-   afterwards.
-3. The miner advisor: for each device and country electricity price, expected pool income, electricity cost,
-   solo-mining odds, and a recommendation (pool / solo as a lottery / do not mine).
-"""
+Outputs cover unattributed blocks, blocks after the model freeze, pool income,
+electricity costs and Poisson solo-mining odds. Concentration estimates retain
+the distinction between pool names and fingerprint families."""
 from __future__ import annotations
 
 import joblib
