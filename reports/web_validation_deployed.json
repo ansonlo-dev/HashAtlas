@@ -1,0 +1,151 @@
+{
+ "started": "2026-11-12T19:57:37.184Z",
+ "base_url": "https://cds3004.ansonlo.dev/",
+ "browser": "157.0.8103.78",
+ "checks": [
+  {
+   "id": "overview: renders",
+   "pass": true,
+   "detail": "10 panels, 4 canvases, 4739 ms"
+  },
+  {
+   "id": "overview: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "radar: renders",
+   "pass": true,
+   "detail": "18 panels, 9 canvases, 2324 ms"
+  },
+  {
+   "id": "radar: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "simulator: renders",
+   "pass": true,
+   "detail": "8 panels, 2 canvases, 2743 ms"
+  },
+  {
+   "id": "simulator: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "eras: renders",
+   "pass": true,
+   "detail": "13 panels, 6 canvases, 2348 ms"
+  },
+  {
+   "id": "eras: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "rules: renders",
+   "pass": true,
+   "detail": "9 panels, 2 canvases, 2257 ms"
+  },
+  {
+   "id": "rules: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "advisor: renders",
+   "pass": true,
+   "detail": "7 panels, 3 canvases, 2241 ms"
+  },
+  {
+   "id": "advisor: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "future: renders",
+   "pass": true,
+   "detail": "10 panels, 5 canvases, 2713 ms"
+  },
+  {
+   "id": "future: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "methods: renders",
+   "pass": true,
+   "detail": "11 panels, 1 canvases, 2233 ms"
+  },
+  {
+   "id": "methods: no horizontal overflow at 1440px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "simulator: tree path rendered and responds to a new block",
+   "pass": true,
+   "detail": "335 example blocks"
+  },
+  {
+   "id": "advisor: electricity cost changes with country",
+   "pass": true,
+   "detail": "$14.70 -> $6.55"
+  },
+  {
+   "id": "radar: reveal shows labels",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "future: break-even responds to the price scenario",
+   "pass": true,
+   "detail": "$0.086/kWh -> $0.171/kWh"
+  },
+  {
+   "id": "overview: no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "radar: no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "advisor: no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "future: no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "id": "no console errors",
+   "pass": true,
+   "detail": ""
+  }
+ ],
+ "console_errors": [],
+ "screenshots": [
+  "screenshots/deployed/web-1440-overview.png",
+  "screenshots/deployed/web-1440-radar.png",
+  "screenshots/deployed/web-1440-simulator.png",
+  "screenshots/deployed/web-1440-eras.png",
+  "screenshots/deployed/web-1440-rules.png",
+  "screenshots/deployed/web-1440-advisor.png",
+  "screenshots/deployed/web-1440-future.png",
+  "screenshots/deployed/web-1440-methods.png",
+  "screenshots/deployed/web-1440-advisor-kazakhstan.png",
+  "screenshots/deployed/web-390-overview.png",
+  "screenshots/deployed/web-390-radar.png",
+  "screenshots/deployed/web-390-advisor.png",
+  "screenshots/deployed/web-390-future.png"
+ ],
+ "finished": "2026-11-12T19:58:19.371Z",
+ "passed": 25,
+ "total": 25
+}
