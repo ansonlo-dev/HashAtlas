@@ -1,0 +1,93 @@
+{
+ "train": {
+  "rows": 267327,
+  "labelled": 262327,
+  "solo": 28,
+  "unknown": 5000,
+  "first": "2019-01-01 00:03:10+00:00",
+  "last": "2023-12-31 23:46:12+00:00",
+  "class_counts": {
+   "AntPool": 40966,
+   "F2Pool": 39326,
+   "Foundry USA": 31989,
+   "Other pools": 31106,
+   "Poolin": 26263,
+   "CloverPool": 24025,
+   "ViaBTC": 23355,
+   "Binance Pool": 18598,
+   "Braiins Pool": 12198,
+   "Huobi.pool": 8963,
+   "BTC.TOP": 5510,
+   "Unknown": 5000,
+   "Solo": 28
+  }
+ },
+ "validation": {
+  "rows": 66539,
+  "labelled": 66449,
+  "solo": 23,
+  "unknown": 90,
+  "first": "2024-01-01 00:29:38+00:00",
+  "last": "2025-03-31 23:33:50+00:00",
+  "class_counts": {
+   "Foundry USA": 20144,
+   "AntPool": 15310,
+   "Other pools": 10369,
+   "ViaBTC": 8944,
+   "F2Pool": 7355,
+   "Binance Pool": 1982,
+   "Braiins Pool": 1145,
+   "CloverPool": 771,
+   "Poolin": 406,
+   "Unknown": 90,
+   "Solo": 23
+  }
+ },
+ "test": {
+  "rows": 83718,
+  "labelled": 83387,
+  "solo": 34,
+  "unknown": 331,
+  "first": "2025-04-01 00:07:27+00:00",
+  "last": "2026-10-31 23:59:27+00:00",
+  "class_counts": {
+   "Foundry USA": 23960,
+   "Other pools": 21634,
+   "AntPool": 15241,
+   "F2Pool": 10052,
+   "ViaBTC": 8944,
+   "Binance Pool": 1632,
+   "Braiins Pool": 1139,
+   "CloverPool": 528,
+   "Unknown": 331,
+   "Poolin": 223,
+   "Solo": 34
+  }
+ },
+ "new": {
+  "rows": 1451,
+  "labelled": 1446,
+  "solo": 3,
+  "unknown": 5,
+  "first": "2026-11-01 00:00:01+00:00",
+  "last": "2026-11-11 23:53:26+00:00",
+  "class_counts": {
+   "Other pools": 383,
+   "Foundry USA": 352,
+   "AntPool": 285,
+   "F2Pool": 253,
+   "ViaBTC": 132,
+   "Braiins Pool": 26,
+   "CloverPool": 10,
+   "Unknown": 5,
+   "Solo": 3,
+   "Poolin": 1,
+   "Binance Pool": 1
+  }
+ },
+ "train_sample": {
+  "rows": 60001,
+  "solo": 28,
+  "rule": "all Solo blocks + month-stratified proportional sample of the rest"
+ }
+}

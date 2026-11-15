@@ -49,19 +49,19 @@ classification:
   pool_negative_sample: 60000   # stratified-by-month pool blocks kept for model search (all solo blocks kept)
   tree:
     criterion: ["gini", "entropy"]
-    max_depth: [2, 3, 4, 5, 6, 8, null]
-    min_samples_leaf: [1, 5, 20, 50]
+    max_depth: [3, 4, 6, 8, 10, 12, 16, null]
+    min_samples_leaf: [5, 20, 50]
     class_weight: [null, "balanced"]
   knn:
-    n_neighbors: [3, 5, 11, 21, 41]
+    n_neighbors: [5, 15, 41]
     weights: ["uniform", "distance"]
     metric: ["manhattan", "euclidean"]
   svm_linear:
     C: [0.01, 0.1, 1.0, 10.0]
   svm_rbf:
-    C: [0.3, 1.0, 3.0, 10.0]
-    gamma: ["scale", 0.01, 0.1]
-  svm_max_train_rows: 12000
+    C: [1.0, 10.0]
+    gamma: ["scale", 0.03]
+  svm_max_train_rows: 8000
   min_precision_for_threshold: 0.50   # operating point: highest recall with precision >= 0.50 on validation
 
 # Section 9: unsupervised era discovery and pool families.
@@ -78,8 +78,8 @@ clustering:
 association:
   window: ["2023-01-01", "2026-11-01"]
   confirm_window: ["2025-04-01", "2026-11-01"]
-  min_support: 0.02
-  min_confidence: 0.50
+  min_support: 0.01          # 1% of ~120k blocks = ~1,200 blocks; pools below ~1% share cannot form rules
+  min_confidence: 0.30       # base rates of single pools are 2-30%, so 30% confidence can already mean lift > 1
   max_len: 4
   solo_min_support_count: 30
 
