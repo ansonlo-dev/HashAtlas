@@ -16,3 +16,6 @@ presentation/build/node_modules/
 presentation/build/render/
 reports/latex/build/
 release/*.zip
+
+# intro video intermediates
+presentation/video/build/

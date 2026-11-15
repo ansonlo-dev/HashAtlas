@@ -1,0 +1,31 @@
+attribute,description,conceptual_type,discrete_continuous,role
+id,Block height (position in the chain),ordinal,discrete,identifier / time index (never a feature)
+time,Timestamp written by the miner (UTC),interval,continuous,split key; derived offsets only
+median_time,Median timestamp of the previous 11 blocks,interval,continuous,derived offset only
+size,Serialised size in bytes,ratio,discrete,feature (derived)
+stripped_size,Size without witness data (bytes),ratio,discrete,feature (derived)
+weight,"Block weight (consensus limit 4,000,000)",ratio,discrete,feature (fullness)
+version,32-bit version field; BIP9 signalling and ASICBoost version rolling,nominal (bit field),discrete,feature after bit decomposition (an integer value is not a quantity)
+nonce,32-bit nonce found by the miner,nominal (bit field),discrete,feature after byte decomposition
+bits,Compact difficulty target,ordinal,discrete,excluded (same for all miners in a period)
+difficulty,Mining difficulty,ratio,continuous,"network context (day level), not a block fingerprint"
+coinbase_data_hex,Coinbase input script (miners write their tag here),nominal (text),discrete,LABEL SOURCE: excluded from features to prevent leakage
+transaction_count,Transactions in the block incl. coinbase,ratio,discrete,feature
+witness_count,Transactions with witness data,ratio,discrete,feature (as share)
+input_count,Inputs spent,ratio,discrete,feature (as ratio)
+output_count,Outputs created,ratio,discrete,feature (as ratio)
+input_total,Total input value (satoshi),ratio,continuous,"excluded (economic activity, not miner)"
+output_total,Total output value (satoshi),ratio,continuous,"excluded (economic activity, not miner)"
+fee_total,Total fees collected (satoshi),ratio,continuous,"feature (log, and share of reward)"
+fee_per_kwu,"Fee per 1,000 weight units (satoshi)",ratio,continuous,feature (log)
+cdd_total,Coin-days destroyed,ratio,continuous,candidate feature (removed by selection)
+generation,"Block subsidy (satoshi), halves every 210,000 blocks",ratio,discrete,day-level economics
+reward,Subsidy + fees (satoshi),ratio,continuous,day-level economics
+guessed_miner,Blockchair's miner guess (coinbase address/tag),nominal,discrete,LABEL SOURCE (fallback): excluded from features
+fee_min,"Lowest effective fee rate included in the block (sat/vB), mempool.space 2019+",ratio,continuous,"feature (log, day-relative): template inclusion policy"
+fee_median,"Median effective fee rate in the block (sat/vB), mempool.space 2019+",ratio,continuous,feature (day-relative)
+fee_p10 / fee_p25 / fee_p75 / fee_p90,"Effective fee-rate percentiles inside the block (sat/vB), mempool.space 2019+",ratio,continuous,features (day-relative): out-of-band 'accelerated' low-fee transactions show up here
+match_rate,mempool.space similarity of the block to its projected template (2023+ only),ratio,continuous,excluded: missing before 2023 and computed by a third party
+source,"Row origin: Blockchair dump (2009-2018) or mempool.space (2019+, and dump gaps)",nominal,discrete,provenance only
+miner,"Our cleaned miner label (pool name, solo service, or Unknown)",nominal,discrete,class label
+era,"Hardware era by date (CPU, GPU, FPGA, ASIC, industrial ASIC)",ordinal,discrete,external reference for checking clusters (never a feature)

@@ -1,13 +1,8 @@
-"""Stage 2 - loading, cleaning, labelling and data-quality checks.
+"""Load block dumps and API responses into a common schema, then label and audit them.
 
-* Loads ~6,500 daily Blockchair dumps (every block since the genesis block) into one typed table.
-* Sets conceptual attribute types (nominal / ordinal / interval / ratio) in a data dictionary.
-* Derives the miner label from the coinbase tag (mempool.space open pool definitions), falls back to
-  Blockchair's address-based guess, and overrides with mempool.space's authoritative solo-service lists.
-* Audits the labels against an independent random sample of mempool.space attributions.
-* Records every quality issue (gaps, duplicates, missing values, out-of-order timestamps, noisy fields)
-  and how it is handled. Out-of-order timestamps are *real protocol behaviour*, not errors, and are kept.
-"""
+Coinbase tags, payout guesses and solo-service lists supply miner labels. Quality
+checks record gaps, duplicates and missing fields. Consensus-valid timestamp
+reversals are retained as observations."""
 from __future__ import annotations
 
 import re
@@ -74,6 +69,9 @@ def load_mempool() -> tuple[pd.DataFrame, dict]:
     stale = int((m["stale"].fillna(0) == 1).sum())
     m = m[m["stale"].fillna(0) != 1]
     fee_min = m["feeRange"].map(lambda r: r[0] if isinstance(r, list) and r else np.nan)
+    # feeRange = effective fee-rate percentiles [min, 10, 25, 50, 75, 90, max] (sat/vB)
+    pct = {f"fee_p{q}": m["feeRange"].map(lambda r, i=i: r[i] if isinstance(r, list) and len(r) == 7 else np.nan)
+           for i, q in ((1, 10), (2, 25), (4, 75), (5, 90))}
     df = pd.DataFrame({
         "id": m["height"].astype("int64"),
         "time": pd.to_datetime(m["timestamp"], unit="s", utc=True),
@@ -90,6 +88,7 @@ def load_mempool() -> tuple[pd.DataFrame, dict]:
         "guessed_miner": m["pool"].fillna("Unknown").astype("string"),
         "fee_min": fee_min.astype(float), "fee_median": m["medianFee"].astype(float),
         "match_rate": m["matchRate"].astype(float),
+        **{k: v.astype(float) for k, v in pct.items()},
     }).drop_duplicates("id")
     return df, {"mempool_rows": len(df), "mempool_stale_removed": stale}
 
@@ -178,7 +177,7 @@ def quality(df: pd.DataFrame, load: dict) -> dict:
     expected = np.arange(h.min(), h.max() + 1)
     missing_heights = np.setdiff1d(expected, h)
     dt = df["time"].diff().dt.total_seconds()
-    retarget = (df["id"] % 2016 != 0) & (df["difficulty"].diff().fillna(0) != 0)
+    retarget = (df["id"] % 2016 != 0) & (df["bits"].diff().fillna(0) != 0) & (df["id"].diff() == 1)
     na = df[USECOLS].isna().sum()
     q = {
         **load,
@@ -193,6 +192,8 @@ def quality(df: pd.DataFrame, load: dict) -> dict:
         "time_minus_median_time_negative": int(((df["time"] - df["median_time"]).dt.total_seconds() <= 0).sum()),
         "difficulty_changes_off_retarget": int(retarget.sum()),
         "empty_blocks": int((df["transaction_count"] == 1).sum()),
+        "under_claimed_reward_blocks": int((df["generation"].astype("int64")
+                                            < (50e8 / 2 ** (df["id"] // 210000)).astype("int64")).sum()),
         "weight_over_limit": int((df["weight"] > 4_000_000).sum()),
         "coinbase_hex_missing": int(df["coinbase_data_hex"].isna().sum()),
         "unknown_miner_share_by_year": df.assign(y=df["time"].dt.year, u=df["miner"] == "Unknown")
@@ -246,6 +247,8 @@ DICTIONARY = [
      "feature (log, day-relative): template inclusion policy"),
     ("fee_median", "Median effective fee rate in the block (sat/vB), mempool.space 2019+", "ratio", "continuous",
      "feature (day-relative)"),
+    ("fee_p10 / fee_p25 / fee_p75 / fee_p90", "Effective fee-rate percentiles inside the block (sat/vB), mempool.space 2019+",
+     "ratio", "continuous", "features (day-relative): out-of-band 'accelerated' low-fee transactions show up here"),
     ("match_rate", "mempool.space similarity of the block to its projected template (2023+ only)", "ratio", "continuous",
      "excluded: missing before 2023 and computed by a third party"),
     ("source", "Row origin: Blockchair dump (2009-2018) or mempool.space (2019+, and dump gaps)", "nominal", "discrete",
@@ -261,7 +264,8 @@ def run() -> dict:
     dumps, load = load_dumps()
     mp, mload = load_mempool()
     start = cfg()["sources"]["mempool_start_height"]
-    dumps = dumps[dumps["id"] < start].assign(source="blockchair", fee_min=np.nan, fee_median=np.nan, match_rate=np.nan)
+    dumps = dumps[dumps["id"] < start].assign(source="blockchair", fee_min=np.nan, fee_median=np.nan, match_rate=np.nan,
+                                               fee_p10=np.nan, fee_p25=np.nan, fee_p75=np.nan, fee_p90=np.nan)
     mp = mp[(mp["id"] >= start) | ~mp["id"].isin(dumps["id"])].assign(source="mempool")
     load.update(mload)
     load["rows_from_dumps"], load["rows_from_mempool"] = int(len(dumps)), int(len(mp))

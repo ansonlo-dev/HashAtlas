@@ -1,4 +1,4 @@
-"""Command-line entry point: `uv run hashatlas <stage>` (see README for the stage order)."""
+"""Run individual pipeline stages or the ordered run-all workflow."""
 from __future__ import annotations
 
 import argparse
@@ -7,7 +7,7 @@ import json
 import sys
 import time
 
-from .config import ARTIFACTS, read_json, write_json
+from .config import ARTIFACTS, _clean, read_json, write_json
 
 STAGES = ["acquire", "clean", "features", "train", "evaluate", "explain", "clusters", "rules",
           "decide", "future", "figures", "webdata", "verify", "report", "notebook"]
@@ -44,7 +44,7 @@ def main(argv: list[str] | None = None) -> None:
         return
     if args.cmd == "predict":
         from . import predict
-        print(json.dumps(predict.run(args), indent=1, ensure_ascii=False))
+        print(json.dumps(_clean(predict.run(args)), indent=1, ensure_ascii=False))
         return
     stages = STAGES[1:] if args.cmd == "run-all" else [args.cmd]
     for st in stages:

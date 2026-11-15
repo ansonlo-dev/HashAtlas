@@ -1,0 +1,51 @@
+1
+00:00:03,438 --> 00:00:07,528
+3 January 2009.
+
+2
+00:00:07,728 --> 00:00:13,978
+The first Bitcoin block is mined, and an ordinary laptop is enough to win the reward.
+
+3
+00:00:17,166 --> 00:00:23,536
+Seventeen years later, the network makes about a thousand quintillion (10²¹) guesses every second.
+
+4
+00:00:23,736 --> 00:00:29,890
+Laptops gave way to graphics cards, and then to warehouses of purpose-built chips.
+
+5
+00:00:33,078 --> 00:00:40,360
+For a small miner at home, the chance of winning a single block is now about 1 in 16,000 a year.
+
+6
+00:00:40,560 --> 00:00:45,946
+And yet, solo miners still won 22 blocks in 2025.
+
+7
+00:00:49,134 --> 00:00:54,256
+Every block also carries a quiet fingerprint of whoever built it:
+
+8
+00:00:54,456 --> 00:00:59,074
+which header bits their machines roll, and how they fill the block.
+
+9
+00:01:02,262 --> 00:01:08,080
+We mined all 975,000 blocks to ask three questions.
+
+10
+00:01:08,280 --> 00:01:11,914
+Can behaviour alone reveal who mined a block?
+
+11
+00:01:12,114 --> 00:01:15,772
+Does the data rediscover the eras of mining?
+
+12
+00:01:15,972 --> 00:01:21,958
+And should a miner in Hong Kong join a pool, gamble solo, or switch off?
+
+13
+00:01:25,146 --> 00:01:27,652
+This is HashAtlas.

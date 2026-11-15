@@ -1,0 +1,70 @@
+{
+ "retrieved_utc": "2026-11-12T18:51:45Z",
+ "pool_definitions": {
+  "pools_v2_sha256": "7ac47b0410134c2a023f09ae78aeb4161016f9528f748d987b6880b4cda19f9f",
+  "pool_list_sha256": "184a656532e329acd9f4ce924a30c03a3ee4bc12c522a7a5bb64da4c71b93e40",
+  "n_definitions": 172,
+  "n_pools_listed": 159
+ },
+ "charts": {
+  "hash-rate": {
+   "points": 6519,
+   "sha256": "134adefe4797a3a3d2a3eabc326cf473acdd944c46bfd7052737003c53b245b5"
+  },
+  "difficulty": {
+   "points": 6519,
+   "sha256": "c3e44194561c4b809bfba09f36771bea0982ae5c2ffd48a787b0aab940476e53"
+  },
+  "market-price": {
+   "points": 6523,
+   "sha256": "4aba8515fd58de6eedc1181c87b5d9b67d6ee20ea4872416d7c7f0c8fb926281"
+  },
+  "miners-revenue": {
+   "points": 6508,
+   "sha256": "0499dd5ce5fb8b16b8a4e74a4c84a97bedd53b37f5ace76bb942d034a8f4b4e8"
+  },
+  "transaction-fees": {
+   "points": 6505,
+   "sha256": "c3129547a8b66643bab987f2f848625807a2e40b75d3dcf06dddc48717fd8405"
+  },
+  "n-transactions": {
+   "points": 6505,
+   "sha256": "88ba1d3548d24872b81085f960cb465cda62f9f3287ec946d7f92b90ea41a004"
+  }
+ },
+ "electricity": {
+  "countries": 144,
+  "period": null,
+  "sha256": "3d4e521728e8b43c99df1840427faf5b41933c6ec5c9e476a6769a780ed22b83"
+ },
+ "solo": {
+  "solo_blocks": 349,
+  "by_service": {
+   "Solo CK": 309,
+   "Bitsolo": 22,
+   "Public Pool": 8,
+   "Braiins Solo": 5,
+   "FutureBit Apollo Solo": 4,
+   "SoloPool.com": 1
+  }
+ },
+ "sources": {
+  "blockchair_dump_url": "https://gz.blockchair.com/bitcoin/blocks/blockchair_bitcoin_blocks_{date}.tsv.gz",
+  "pools_definitions_url": "https://raw.githubusercontent.com/mempool/mining-pools/master/pools-v2.json",
+  "mempool_api": "https://mempool.space/api/v1",
+  "blockchain_charts_url": "https://api.blockchain.info/charts/{chart}?timespan=all&format=json&sampled=false",
+  "electricity_url": "https://www.globalpetrolprices.com/electricity_prices/"
+ },
+ "mempool_blocks": {
+  "start_height": 556459,
+  "pools": 159,
+  "blocks": 418521,
+  "calls": 4364,
+  "seconds": 799.8
+ },
+ "mempool_gaps": {
+  "missing_heights": 66,
+  "gap_blocks": 6022,
+  "calls": 66
+ }
+}

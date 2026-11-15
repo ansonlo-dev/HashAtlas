@@ -1,0 +1,62 @@
+{
+ "acquire": {
+  "seconds": 37.7,
+  "finished": "2026-11-13 02:52:23"
+ },
+ "clean": {
+  "seconds": 45.2,
+  "finished": "2026-11-13 02:59:35"
+ },
+ "features": {
+  "seconds": 3.4,
+  "finished": "2026-11-13 02:59:39"
+ },
+ "clusters": {
+  "seconds": 3.8,
+  "finished": "2026-11-13 03:00:51"
+ },
+ "rules": {
+  "seconds": 1.0,
+  "finished": "2026-11-13 03:03:05"
+ },
+ "future": {
+  "seconds": 1.0,
+  "finished": "2026-11-13 03:44:45"
+ },
+ "train": {
+  "seconds": 1224.0,
+  "finished": "2026-11-13 03:39:30"
+ },
+ "evaluate": {
+  "seconds": 268.8,
+  "finished": "2026-11-13 03:44:19"
+ },
+ "explain": {
+  "seconds": 6.0,
+  "finished": "2026-11-13 03:44:41"
+ },
+ "decide": {
+  "seconds": 1.4,
+  "finished": "2026-11-13 03:44:43"
+ },
+ "figures": {
+  "seconds": 9.7,
+  "finished": "2026-11-14 02:54:11"
+ },
+ "webdata": {
+  "seconds": 1.5,
+  "finished": "2026-11-13 03:49:27"
+ },
+ "verify": {
+  "seconds": 1.3,
+  "finished": "2026-11-13 03:58:54"
+ },
+ "report": {
+  "seconds": 8.1,
+  "finished": "2026-11-14 13:40:11"
+ },
+ "notebook": {
+  "seconds": 2.8,
+  "finished": "2026-11-13 03:55:55"
+ }
+}

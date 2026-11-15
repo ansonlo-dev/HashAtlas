@@ -1,13 +1,7 @@
-"""Stage 1 - acquisition.
+"""Cache the block sources, pool definitions, network charts and electricity snapshots.
 
-Downloads, with retries, resumable caching and SHA-256 provenance:
-  * Blockchair daily block dumps (every Bitcoin block since 3 Jan 2009; ~6,500 gzip files),
-  * mempool.space mining-pool definitions (coinbase tags / payout addresses) and the pool list,
-  * mempool.space block lists of every solo-mining service (ground truth for the solo class),
-  * a random audit sample of mempool.space block attributions (to measure our own labelling accuracy),
-  * blockchain.com daily network charts (hash rate, difficulty, price, miner revenue, fees),
-  * a dated snapshot of household and business electricity prices by country (GlobalPetrolPrices).
-"""
+Downloads retry with back-off and reuse cached files. The source manifest records
+SHA-256 hashes so later stages can identify the inputs used by a run."""
 from __future__ import annotations
 
 import hashlib
@@ -60,7 +54,7 @@ def _get(s: requests.Session, url: str, tries: int = 5, timeout: int = 60, **kw)
     raise RuntimeError(f"GET failed after {tries} tries: {url}: {last!r}")
 
 
-# ------------------------------------------------------------------ block dumps
+# Block dumps
 def _days(first: str, last: str):
     d, end = date.fromisoformat(first), date.fromisoformat(last)
     while d <= end:
@@ -119,7 +113,7 @@ def fetch_block_dumps() -> dict:
             "combined_sha256": combined.hexdigest(), "seconds": round(time.time() - t0, 1)}
 
 
-# ------------------------------------------------------------------ mempool.space
+# Mempool.space
 def fetch_pool_definitions() -> dict:
     s = _session()
     c = cfg()["sources"]
@@ -243,7 +237,10 @@ def fetch_mempool_heights(heights: list[int]) -> dict:
     import json as js
     api = cfg()["sources"]["mempool_api"]
     s = _session()
-    need, rows, calls = set(heights), [], 0
+    gap_file = RAW / "mempool_gap_blocks.jsonl.gz"
+    rows = [js.loads(line) for line in gz.open(gap_file, "rt")] if gap_file.exists() else []
+    have = {r["height"] for r in rows}
+    need, calls = set(heights) - have, 0
     while need:
         h = max(need)
         batch = _get(s, f"{api}/blocks/{h}").json()
@@ -254,13 +251,13 @@ def fetch_mempool_heights(heights: list[int]) -> dict:
                 need.discard(b["height"])
         need.discard(h)
         time.sleep(0.25)
-    with gz.open(RAW / "mempool_gap_blocks.jsonl.gz", "wt") as fh:
+    with gz.open(gap_file, "wt") as fh:
         for r in rows:
             fh.write(js.dumps(r) + "\n")
     return {"gap_blocks": len(rows), "calls": calls}
 
 
-# ------------------------------------------------------------------ network charts and electricity
+# Network charts and electricity
 def fetch_charts() -> dict:
     s = _session()
     c = cfg()["sources"]
@@ -314,15 +311,25 @@ def run(parts: list[str] | None = None) -> dict:
         manifest["mempool_blocks"] = fetch_mempool_blocks(cfg()["sources"]["mempool_start_height"])
         print("mempool blocks:", manifest["mempool_blocks"], flush=True)
     if "gaps" in parts:
-        import pandas as pd
-        ids = []
-        for p in sorted((RAW / "blockchair_blocks").glob("*.tsv.gz")):
-            ids.append(pd.read_csv(p, sep="\t", usecols=["id"])["id"].to_numpy())
+        # heights missing from both the dumps (2009-2018) and the per-pool mempool.space lists (2019+)
+        import gzip as gz
+        import json as js
+
         import numpy as np
-        have = np.unique(np.concatenate(ids))
+        import pandas as pd
         start = cfg()["sources"]["mempool_start_height"]
-        missing = np.setdiff1d(np.arange(0, start), have).tolist()
-        manifest["mempool_gaps"] = {"missing_heights_before_start": len(missing), **fetch_mempool_heights(missing)}
+        ids = [x[x < start] for x in (pd.read_csv(p, sep="\t", usecols=["id"])["id"].to_numpy()
+                                      for p in sorted((RAW / "blockchair_blocks").glob("*.tsv.gz")))]
+        for p in sorted((RAW / "mempool_blocks").glob("*.jsonl.gz")):
+            with gz.open(p, "rt") as fh:
+                ids.append(np.array([js.loads(line)["height"] for line in fh], dtype=np.int64))
+        gap_file = RAW / "mempool_gap_blocks.jsonl.gz"
+        if gap_file.exists():
+            with gz.open(gap_file, "rt") as fh:
+                ids.append(np.array([js.loads(line)["height"] for line in fh], dtype=np.int64))
+        have = np.unique(np.concatenate(ids))
+        missing = np.setdiff1d(np.arange(0, have.max() + 1), have).tolist()
+        manifest["mempool_gaps"] = {"missing_heights": len(missing), **fetch_mempool_heights(missing)}
         print("gaps:", manifest["mempool_gaps"], flush=True)
     if "audit" in parts:
         tip = max(b["height"] for b in read_json(RAW / "solo_blocks.json")) if (RAW / "solo_blocks.json").exists() else 975000

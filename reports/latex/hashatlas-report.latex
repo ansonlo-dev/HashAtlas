@@ -1,0 +1,61 @@
+$-- HashAtlas group project report template (pandoc). Based on pandoc's default LaTeX template;
+$-- the title block is replaced by a title page and the styling lives in preamble.tex.
+$passoptions.latex()$
+\documentclass[
+$if(fontsize)$
+  $fontsize$,
+$endif$
+$if(papersize)$
+  $papersize$paper,
+$endif$
+$for(classoption)$
+  $classoption$$sep$,
+$endfor$
+]{$documentclass$}
+\usepackage{xcolor}
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$endif$
+\usepackage{amsmath,amssymb}
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+$endif$
+$fonts.latex()$
+$font-settings.latex()$
+$common.latex()$
+$for(header-includes)$
+$header-includes$
+$endfor$
+$after-header-includes.latex()$
+$hypersetup.latex()$
+
+\newcommand{\ReportTitle}{$title$}
+\newcommand{\ReportSubtitle}{$subtitle$}
+\newcommand{\ReportDate}{$date$}
+\newcommand{\ReportTeam}{$team$}
+\newcommand{\ReportShortTitle}{$shorttitle$}
+\newcommand{\ReportKind}{$reportkind$}
+
+\begin{document}
+\pagenumbering{roman}
+\HashAtlasTitlePage
+
+$if(toc)$
+{
+\hypersetup{linkcolor=ReportInk}
+\setcounter{tocdepth}{$toc-depth$}
+\tableofcontents
+}
+$endif$
+$if(lof)$
+\listoffigures
+$endif$
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{report}
+
+$body$
+
+\end{document}
