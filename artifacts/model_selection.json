@@ -1,0 +1,145 @@
+{
+ "rule": "highest validation macro-F1; the decision tree is preferred if within 0.01 (interpretability)",
+ "chosen_family": "tree",
+ "best_by_score": "tree",
+ "chosen_params": {
+  "class_weight": "balanced",
+  "criterion": "gini",
+  "max_depth": 12,
+  "min_samples_leaf": 5
+ },
+ "features": [
+  "ver_rolled",
+  "ver_roll_popcount",
+  "ver_bip9",
+  "ver_signal_bits",
+  "ver_b13",
+  "ver_b14",
+  "ver_b15",
+  "ver_b16",
+  "ver_b17",
+  "ver_b18",
+  "ver_b19",
+  "ver_b20",
+  "ver_b21",
+  "ver_b22",
+  "ver_b23",
+  "ver_b24",
+  "ver_b25",
+  "ver_b26",
+  "ver_b27",
+  "ver_b28",
+  "nonce_b0",
+  "nonce_b1",
+  "nonce_b5",
+  "nonce_b6",
+  "nonce_b7",
+  "nonce_b8",
+  "nonce_b9",
+  "nonce_b13",
+  "nonce_b14",
+  "nonce_b15",
+  "nonce_b16",
+  "nonce_b20",
+  "nonce_b22",
+  "nonce_b23",
+  "nonce_b25",
+  "nonce_b30",
+  "nonce_b31",
+  "log_tx_count",
+  "is_empty",
+  "fullness",
+  "witness_tx_share",
+  "witness_byte_share",
+  "io_ratio",
+  "avg_tx_vbytes",
+  "log_fee_per_kwu",
+  "fee_share",
+  "log_min_fee",
+  "rel_min_fee",
+  "rel_median_fee",
+  "rel_tx_count",
+  "rel_fullness"
+ ],
+ "classes": [
+  "AntPool",
+  "BTC.TOP",
+  "Binance Pool",
+  "Braiins Pool",
+  "CloverPool",
+  "F2Pool",
+  "Foundry USA",
+  "Huobi.pool",
+  "Poolin",
+  "ViaBTC",
+  "Other pools",
+  "Solo"
+ ],
+ "template_families": {
+  "map": {
+   "AntPool": "AntPool",
+   "BTC.TOP": "BTC.TOP",
+   "Binance Pool": "Family: Binance Pool + F2Pool + Other pools + Poolin",
+   "F2Pool": "Family: Binance Pool + F2Pool + Other pools + Poolin",
+   "Other pools": "Family: Binance Pool + F2Pool + Other pools + Poolin",
+   "Poolin": "Family: Binance Pool + F2Pool + Other pools + Poolin",
+   "Braiins Pool": "Family: Braiins Pool + ViaBTC",
+   "ViaBTC": "Family: Braiins Pool + ViaBTC",
+   "CloverPool": "CloverPool",
+   "Foundry USA": "Foundry USA",
+   "Huobi.pool": "Huobi.pool",
+   "Solo": "Solo"
+  },
+  "cut_height": 6.345913028758077,
+  "groups": [
+   [
+    "Binance Pool",
+    "F2Pool",
+    "Other pools",
+    "Poolin"
+   ],
+   [
+    "Braiins Pool",
+    "ViaBTC"
+   ],
+   [
+    "AntPool"
+   ],
+   [
+    "BTC.TOP"
+   ],
+   [
+    "CloverPool"
+   ],
+   [
+    "Foundry USA"
+   ],
+   [
+    "Huobi.pool"
+   ],
+   [
+    "Solo"
+   ]
+  ],
+  "merge_heights": [
+   4.2305,
+   5.6052,
+   6.1063,
+   6.1153,
+   6.5765,
+   7.1022,
+   7.5547,
+   8.3506,
+   8.9474,
+   10.6919,
+   14.8677
+  ]
+ },
+ "solo_threshold": {
+  "value": 0.5,
+  "validation_recall": 0.043478260869565216,
+  "rule": "highest recall with precision >= 0.5 on validation"
+ },
+ "final_refit": "chosen configuration refitted on train-sample + validation before the sealed test",
+ "frozen_at": "2026-11-13 03:39:30"
+}
