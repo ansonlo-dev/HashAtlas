@@ -5,7 +5,7 @@ names, roles and contributions are in [`configs/team.json`](configs/team.json) a
 
 | Submission item | Where |
 |---|---|
-| GitHub repository (public, full commit history) | **https://github.com/ansonlo-dev/HashAtlas** (replace before submission) |
+| GitHub repository (public, full commit history) | **https://github.com/ansonlo-dev/HashAtlas** |
 | Project report (PDF, with each member's contributions) | [`reports/technical_report.pdf`](reports/technical_report.pdf) |
 | Presentation (~16 min, five presenters) and script | [`presentation/HashAtlas.pptx`](presentation/HashAtlas.pptx), [`.pdf`](presentation/HashAtlas.pdf), [`slide_by_slide_script.md`](presentation/slide_by_slide_script.md) |
 | Agent-use trajectories (one per member) | [`agent_trajectories/README.md`](agent_trajectories/README.md) |
