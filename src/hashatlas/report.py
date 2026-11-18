@@ -808,17 +808,28 @@ def readme_results() -> None:
     q = read_json(ARTIFACTS / "quality_report.json")
     op = tm["operational_family"]
     T = tm["families"]
+    new_blocks = dec["new_blocks"]
     adv = pd.DataFrame(dec["advisor"])
     bit = adv[adv["device"].str.startswith("Bitaxe")].iloc[0]
     hk = adv[(adv["device"] == "Antminer S21") & (adv["country"] == "Hong Kong") & (adv["tariff"] == "business")].iloc[0]
+    outcome = "profit" if hk["profit_usd_day"] >= 0 else "loss"
     rows = [
-        ["Data", f"{n(q['rows_loaded'])} blocks (heights 0-{n(q['height_range'][1])}), 0 missing / 0 duplicate heights; label precision {p(q['label_audit']['precision_when_tag_found'], 2)} vs mempool.space"],
+        ["Data", f"{n(q['rows_loaded'])} blocks (heights {n(q['height_range'][0])}-{n(q['height_range'][1])}), "
+                 f"{n(q['missing_heights'])} missing and {n(q['duplicate_heights'])} duplicate heights. "
+                 f"The audit agreed with mempool.space {p(q['label_audit']['precision_when_tag_found'], 2)} "
+                 "of the time when it found a coinbase tag."],
         ["Fingerprint classifier (sealed test 2025-04 → 2026-10)", f"{FAM[op]}: macro-F1 {f(T[op]['macro_f1'])} (95% CI {f(tm['bootstrap']['macro_f1_95ci'][0])}-{f(tm['bootstrap']['macro_f1_95ci'][1])}), accuracy {p(T[op]['accuracy'], 0)}, top-3 {p(T[op].get('top3_accuracy'), 0)}, template-family accuracy {p(T[op]['family_accuracy'], 0)}; baselines ≤ {f(max(T[b]['macro_f1'] for b in ('majority', 'stratified_random', 'decision_stump')))}"],
-        ["Blocks mined after the freeze", f"{p(dec['new_blocks']['accuracy'], 1)} correct on {n(dec['new_blocks']['labelled'])} unseen blocks"],
+        ["Blocks mined after the freeze", f"{p(new_blocks['accuracy'], 1)} correct on {n(new_blocks['labelled'])} "
+                                        f"labelled blocks ({n(new_blocks['blocks'])} blocks scored)"],
         ["Eras (unsupervised)", f"K-means K={cl['k_selected']} ARI {f(cl['ari_vs_hardware_eras']['kmeans'], 2)}; Ward ARI {f(cl['hierarchical']['ward']['ari_vs_hardware_eras'], 2)} vs documented hardware eras"],
         ["Association rules", f"{n(ru['frequent_itemsets'])} frequent itemsets from {n(ru['transactions'])} blocks; {ru['n_rules']} rules; brute-force check {'passed' if ru['brute_force_check']['passed'] else 'FAILED'}"],
-        ["Hong Kong miner advice", f"S21 {'profit' if hk['profit_usd_day'] >= 0 else 'loss'} {f(abs(hk['profit_usd_day']), 2)} USD/day at {f(hk['price_usd_kwh'], 3)} USD/kWh (break-even {f(hk['breakeven_usd_kwh'], 3)}); 1.2 TH/s home miner: {odds(bit['solo_p_block_per_year'])} per year"],
-        ["Future Lab", f"2028 halving ~{fu['halving']['date_p50']}; backtest 80% band coverage {p(fu['backtest']['summary']['coverage_80pct_band'], 0)}"],
+        ["Hong Kong miner advice", f"Antminer S21: {f(abs(hk['profit_usd_day']), 2)} USD/day {outcome} "
+                                   f"at {f(hk['price_usd_kwh'], 3)} USD/kWh (Hong Kong business tariff), with break-even "
+                                   f"at {f(hk['breakeven_usd_kwh'], 3)} USD/kWh. A 1.2 TH/s miner has a "
+                                   f"{odds(bit['solo_p_block_per_year'])} annual chance of a solo block."],
+        ["Future Lab", f"Median scenario date for the halving is {fu['halving']['date_p50']}. "
+                       f"The nominal 80% interval covered {p(fu['backtest']['summary']['coverage_80pct_band'], 0)} "
+                       "of backtest outcomes."],
         ["Verification", f"{ver['passed']}/{ver['total']} independent checks passed"],
     ]
     block = "## Key results\n\n" + table(["", "Result"], rows, ["l", "l"]) + "\n"

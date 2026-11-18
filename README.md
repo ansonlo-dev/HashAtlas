@@ -1,12 +1,12 @@
 # HashAtlas: Can a Small Bitcoin Miner Still Win?
 
-**Lingnan University · CDS3004 Data Mining · Group D · 26/27 Sem 1 · CRN 234**
+**Lingnan University · CDS3004 Data Mining · Group D · 2026/27 Term 1 · CRN 234**
 
 [![HashAtlas project banner showing the study scope: 975,494 Bitcoin blocks, 17 years and 27 economies](web/public/og.png)](https://cds3004.ansonlo.dev/)
 
 **[Open the live dashboard](https://cds3004.ansonlo.dev/)** · [Research figures](#research-figures) · [Sample slides](#sample-slides) · [Project report](reports/technical_report.pdf) · [Reproduce the analysis](#reproduce)
 
-HashAtlas uses 975,494 Bitcoin blocks to study how miners build blocks, how mining changed across hardware eras, and how electricity prices affect the choice to mine solo, join a pool, or switch off.
+HashAtlas uses 975,494 Bitcoin blocks from 3 January 2009 to 11 November 2026 to study how miners build blocks, how mining changed across hardware eras, and how electricity prices affect the choice to mine solo, join a pool, or switch off. The model evaluation uses a 31 October 2026 cutoff, with November blocks reserved for the post-freeze demonstration. [Analysis configuration](configs/config.yaml)
 
 <details>
 <summary>Play the animated project preview</summary>
@@ -19,9 +19,9 @@ HashAtlas uses 975,494 Bitcoin blocks to study how miners build blocks, how mini
 
 <a href="https://cds3004.ansonlo.dev/#/overview"><img src="reports/screenshots/deployed/web-1440-overview.png" width="600" alt="Deployed HashAtlas Overview showing Bitcoin hash rate, mining eras, pool market share and solo-mining odds"></a>
 
-The screenshot shows the deployed desktop Overview. Open the interactive views to [inspect post-freeze blocks](https://cds3004.ansonlo.dev/#/radar), [change a block's fingerprint](https://cds3004.ansonlo.dev/#/simulator), [compare mining costs across 27 economies](https://cds3004.ansonlo.dev/#/advisor), or [explore scenarios for the 2028 halving](https://cds3004.ansonlo.dev/#/future).
+The screenshot shows the desktop Overview on the live Cloudflare Workers deployment. Open the interactive views to [inspect post-freeze blocks](https://cds3004.ansonlo.dev/#/radar), [change a block's fingerprint](https://cds3004.ansonlo.dev/#/simulator), [compare mining costs across 27 economies](https://cds3004.ansonlo.dev/#/advisor), or [explore scenarios for the 2028 halving](https://cds3004.ansonlo.dev/#/future). [Deployment configuration](web/wrangler.jsonc)
 
-[More deployed screenshots, including mobile views](reports/screenshots/deployed)
+[Mobile Overview](reports/screenshots/deployed/web-390-overview.png) · [All deployed screenshots](reports/screenshots/deployed) · [Browser verification](reports/web_validation_deployed.json)
 
 ## Research figures
 
@@ -46,15 +46,17 @@ The [solo-mining odds](reports/figures/f03_solo_odds.png), [Miner Advisor result
 
 |  | Result |
 | :--- | :--- |
-| Data | 975,494 blocks (heights 0-975,493), 0 missing / 0 duplicate heights; label precision 99.95% vs mempool.space |
+| Data | 975,494 blocks (heights 0-975,493), 0 missing and 0 duplicate heights. The audit agreed with mempool.space 99.95% of the time when it found a coinbase tag. |
 | Fingerprint classifier (sealed test 2025-04 → 2026-10) | Decision tree: macro-F1 0.244 (95% CI 0.238-0.249), accuracy 42%, top-3 69%, template-family accuracy 46%; baselines ≤ 0.081 |
-| Blocks mined after the freeze | 36.1% correct on 1,446 unseen blocks |
+| Blocks mined after the freeze | 36.1% correct on 1,446 labelled blocks (1,451 blocks scored) |
 | Eras (unsupervised) | K-means K=3 ARI 0.71; Ward ARI 0.89 vs documented hardware eras |
 | Association rules | 837 frequent itemsets from 120,538 blocks; 103 rules; brute-force check passed |
-| Hong Kong miner advice | S21 loss 7.26 USD/day at 0.175 USD/kWh (break-even 0.089); 1.2 TH/s home miner: 1 in 16,362 per year |
-| Future Lab | 2028 halving ~2028-04-07; backtest 80% band coverage 75% |
+| Hong Kong miner advice | Antminer S21: 7.26 USD/day loss at 0.175 USD/kWh (Hong Kong business tariff), with break-even at 0.089 USD/kWh. A 1.2 TH/s miner has a 1 in 16,362 annual chance of a solo block. |
+| Future Lab | Median scenario date for the halving is 2028-04-07. The nominal 80% interval covered 75% of backtest outcomes. |
 | Verification | 17/17 independent checks passed |
 <!-- KEY RESULTS END -->
+
+The Miner Advisor uses 30-day network averages through 31 October 2026. The Overview headline shows the solo-mining estimate for the week starting 2 November 2026. [Miner Advisor results](artifacts/decisions.json) · [Overview timeline](web/public/data/timeline.json)
 
 ## Sample slides
 
@@ -64,9 +66,9 @@ The [solo-mining odds](reports/figures/f03_solo_odds.png), [Miner Advisor result
 | [12 · Weekly block patterns reveal three mining eras][slide-12] | How Ward, K-means and DBSCAN compare with documented hardware eras |
 | [15 · Should you mine in Hong Kong?][slide-15] | Break-even electricity prices and results for four mining devices |
 
-[slide-09]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=9
-[slide-12]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=12
-[slide-15]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=15
+[slide-09]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@main/presentation/HashAtlas.pdf#page=9
+[slide-12]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@main/presentation/HashAtlas.pdf#page=12
+[slide-15]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@main/presentation/HashAtlas.pdf#page=15
 
 [Full slide deck (PDF)](presentation/HashAtlas.pdf) · [PowerPoint](presentation/HashAtlas.pptx) · [Speaker script](presentation/slide_by_slide_script.md) · [90-second introduction video](presentation/video/hashatlas_intro.mp4)
 
@@ -74,7 +76,8 @@ The [solo-mining odds](reports/figures/f03_solo_odds.png), [Miner Advisor result
 
 | Material | Where |
 |---|---|
-| Technical report and individual contributions | [Report PDF](reports/technical_report.pdf), section 17 |
+| Public GitHub repository | [ansonlo-dev/HashAtlas](https://github.com/ansonlo-dev/HashAtlas) |
+| Technical report and individual contributions | [Report PDF](reports/technical_report.pdf), AI declaration in §15 and contributions in §17 |
 | Team membership and roles | [Team HashAtlas (five members)](configs/team.json) |
 | Agent-use trajectories | [Per-member index](agent_trajectories/README.md) |
 | Submission checklist and rubric map | [Submission guide](SUBMISSION.md) |
@@ -112,11 +115,11 @@ member’s own record of tools, prompts, responses and revisions belongs for the
 
 ## Requirements
 
-- Linux or macOS; Python 3.12 managed by [uv](https://docs.astral.sh/uv/) (dependencies locked in `uv.lock`).
+- [uv](https://docs.astral.sh/uv/) with Python 3.12 and the project dependencies in `uv.lock`.
 - For the PDF report: `pandoc` 3.x and TeX Live with `latexmk`, LuaLaTeX and the Libertinus fonts.
-- For the dashboard: [Bun](https://bun.sh) (`web/`), and Node + a local Chrome for the browser check.
-- For the slides: Node with `pptxgenjs` (`presentation/build`), LibreOffice for the PDF export.
-- Internet access to `gz.blockchair.com`, `mempool.space`, `api.blockchain.info` and `globalpetrolprices.com`.
+- For the dashboard: [Bun](https://bun.sh). The browser checks use Node.js and Chrome. Set `CHROME_PATH` if Chrome is outside `/opt/google/chrome/chrome`.
+- For the presentation build: Bun, Node.js, Python with `pikepdf`, and Poppler (`pdftoppm` and `pdfinfo`). Point `PPTX_SKILL` to the PPTX helper directory containing `scripts/apply_theme.js` and `scripts/office/validate.py`. Set `SOFFICE` to the LibreOffice executable or use the script's LibreOffice Flatpak default. [Presentation build script](presentation/build/make.sh)
+- For data acquisition: access to the hosts listed in [the analysis configuration](configs/config.yaml), including the Blockchair dumps, mempool.space, GitHub raw pool definitions, blockchain.com charts, and GlobalPetrolPrices.
 
 ## Reproduce
 
@@ -126,10 +129,12 @@ uv run pytest -q                 # unit tests
 uv run hashatlas acquire         # download (resumable; SHA-256 provenance in artifacts/source_manifest.json)
 uv run hashatlas run-all         # clean → features → train → evaluate → explain → clusters → rules → decide
                                  # → future → figures → webdata → verify → report → notebook
-cd web && bun install && bun test src && bun run validate-data && bun run build   # dashboard
-node scripts/e2e.mjs             # bounded browser check, screenshots in reports/screenshots/
-cd ../presentation/build && bun install && ./make.sh                              # slides + PDF
+(cd web && bun install --frozen-lockfile && bun test src && bun run validate-data && bun run build)
+(cd web && bun run e2e)          # check the built dashboard and save screenshots to reports/screenshots/
+(cd presentation/build && bun install --frozen-lockfile && ./make.sh)
 ```
+
+To check the deployed dashboard and refresh its screenshot gallery, run `(cd web && E2E_BASE_URL=https://cds3004.ansonlo.dev/ bun run e2e)` from the repository root.
 
 | Stage | What it does | Main outputs |
 |---|---|---|
@@ -154,14 +159,15 @@ the evidence can be reviewed without rerunning.
 ## Repository layout
 
 ```
-configs/            config.yaml (all settings), team.json (members and contributions)
+configs/            config.yaml (pipeline settings), team.json (members and contributions)
 src/hashatlas/      acquire, clean, features, train, evaluate, explain, clusters, rules, decide, future,
                     figures, webdata, verify, report, notebook, predict, cli
 tests/              unit tests (bit decomposition, leakage, Apriori vs brute force, economics, bootstrap)
 artifacts/          evidence files (JSON/CSV)        models/   fitted pipelines (joblib)
 reports/            technical_report.{md,tex,pdf}, figures/, screenshots/, latex/
 notebooks/          executed walkthrough notebook     web/      React + TypeScript + ECharts dashboard
-presentation/       HashAtlas.pptx/.pdf, script, timing, build/  agent_trajectories/  per-member agent logs
+presentation/       HashAtlas.pptx/.pdf, script, timing, build/
+agent_trajectories/  per-member trajectory index
 ```
 
 ## Data sources and terms
@@ -183,4 +189,3 @@ from the illustrative work plan. Reconstructed AuthorDate values refer to those 
 placeholder for unknown times; CommitDate records the actual reconstruction. Source snapshot dates remain in
 the commit messages. These dates do not establish when a snapshot's individual files were written. Editorial
 changes with known creation dates retain those AuthorDate values.
-The dashboard is deployed with Cloudflare Workers (`web/wrangler.jsonc`) at <https://cds3004.ansonlo.dev/>.
