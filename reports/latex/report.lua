@@ -127,10 +127,14 @@ function Pandoc(doc)
       local following = doc.blocks[j]
       local lines = following and following.t == "RawBlock"
         and following.text:match("^\\Needspace{([%d%.]+)\\baselineskip}")
-      if pandoc.utils.stringify(block.content):match("Reproducibility and references$") then
+      local title = pandoc.utils.stringify(block.content)
+      if title:match("Reproducibility and references$") then
         table.insert(out, pandoc.RawBlock("latex", "\\clearpage"))
       else
         local reserve = lines and tonumber(lines) + 2 * #headings or 3 + 2 * #headings
+        if title == "Declaration of Use of AI-agent" then
+          reserve = 15
+        end
         table.insert(out, pandoc.RawBlock("latex", string.format("\\Needspace{%.1f\\baselineskip}", reserve)))
       end
       for _, heading in ipairs(headings) do table.insert(out, heading) end

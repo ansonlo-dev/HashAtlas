@@ -617,11 +617,32 @@ backtest error is large. (7) Family similarity is not proof of common ownership.
   provide an additional measure for decentralisation research. At the Hong Kong tariffs used here, home mining does
   not cover electricity costs.
 
-# 15. AI-agent use and verification
+# 15. Declaration of Use of AI-agent
 
-The team used AI coding agents (see `agent_trajectories/`) within the course's review workflow. Team members defined
-the problem and constraints, reviewed the proposed plans, and checked the generated code and outputs. The following
-corrections are recorded in the project:
+We, LO Chi Kong, POON Tsz Chun, SUBEDI Anukaran, YE Xiaochen and LO Ka Hung, declare that generative artificial intelligence (GAI) tools were used to prepare the submitted
+work for CDS3004 Data Mining at Lingnan University (2026/27 Term 1), Group D’s HashAtlas group project.
+
+**Tools and material incorporated.** Anthropic Claude Code helped explore project alternatives and generated initial
+implementations for data acquisition and preparation, modelling and evaluation, and parts of the dashboard, report
+and presentation. The project retains AI-generated and AI-revised code and text from this work. OpenAI Codex
+assisted with revisions to the README, presentation and report, and drafted and integrated this declaration.
+The introduction video on slide 2 uses Microsoft Edge neural text-to-speech (the `en-US-SteffanNeural` voice)
+via `edge-tts` to synthesise narration from the video script. Tool references are in Section 18.
+
+**Examples of instructions given.** We asked Claude Code to explore a Bitcoin project on solo mining, electricity
+prices across economies and the GPU and ASIC eras, then to consider how much future analysis to include. We asked
+Codex to revise the presentation while retaining its theme and to prepare the AI-use declaration using the
+University’s GAI guidelines. These are paraphrases of project prompts.
+
+**Review and responsibility.** The team chose the Bitcoin topic and takes responsibility for the research questions,
+method choices, source attribution and conclusions. The team is responsible for checking the accuracy, possible
+bias and reuse rights of material retained from AI outputs. The
+[agent-use trajectory index](https://github.com/ansonlo-dev/HashAtlas/tree/main/agent_trajectories) identifies
+where each member’s own record of tools, prompts, responses and revisions belongs for the course submission.
+
+## Verification of agent outputs
+
+The following corrections show how the project addressed problems found in agent-assisted work.
 
 * An early class design scored macro-F1 over *all* classes, including pools that had stopped mining; reviewers changed
   it to classes present in the evaluation period (predicting a vanished pool is still an error).
@@ -715,3 +736,11 @@ retrieved 2026-11-12). Hardware specifications are manufacturer figures (approxi
 **Methods.** Course lectures 2-10 (CDS3004, Lingnan University); scikit-learn user guide (trees, KNN, SVM, clustering,
 model selection); Nakamoto, S. (2008) *Bitcoin: A Peer-to-Peer Electronic Cash System*; BIP 9 and BIP 320 (version-bit
 signalling and general-purpose version bits).
+
+**AI tools and declaration guidance.**
+
+* Anthropic. (n.d.). [*Claude Code*](https://code.claude.com/docs/en/overview) [AI coding agent].
+* OpenAI. (n.d.). [*Codex*](https://openai.com/codex/) [AI coding agent].
+* Microsoft. (n.d.). *Microsoft Edge neural text-to-speech* (en-US-SteffanNeural) [Speech synthesis service]. Accessed using [edge-tts](https://github.com/rany2/edge-tts).
+* Lingnan University. (2024, October). [*Guidelines for using generative artificial intelligence (GAI) tools at Lingnan University*](https://www.ln.edu.hk/tlc/f/page/107180/326402/Guidelines%20for%20Using%20GAI%20Tools%20%28Oct%202024%29.pdf), §§2.1–2.4.
+* Lingnan University. (2025, August). [*Best practices for ethical and responsible use of generative artificial intelligence (GAI) tools in course assessments*](https://www.ln.edu.hk/tlc/f/page/107180/348570/Best%20Practices%20for%20Ethicial%20and%20Responsibilities%20Use%20of%20GAI%20%28Aug%202025%29.pdf), §§4–5.

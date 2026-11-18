@@ -76,8 +76,39 @@ The [solo-mining odds](reports/figures/f03_solo_odds.png), [Miner Advisor result
 |---|---|
 | Technical report and individual contributions | [Report PDF](reports/technical_report.pdf), section 17 |
 | Team membership and roles | [Team HashAtlas (five members)](configs/team.json) |
-| Agent-use trajectories | [Per-member records](agent_trajectories/README.md) |
+| Agent-use trajectories | [Per-member index](agent_trajectories/README.md) |
 | Submission checklist and rubric map | [Submission guide](SUBMISSION.md) |
+
+## Declaration of Use of AI-agent
+
+We, LO Chi Kong, POON Tsz Chun, SUBEDI Anukaran, YE Xiaochen and LO Ka Hung, declare that generative artificial
+intelligence (GAI) tools were used to prepare the submitted work for CDS3004 Data Mining at Lingnan University
+(2026/27 Term 1), Group D’s HashAtlas group project.
+
+**Tools and material incorporated.** Anthropic Claude Code helped explore project alternatives and generated
+initial implementations for data acquisition and preparation, modelling and evaluation, and parts of the dashboard,
+report and presentation. The project retains AI-generated and AI-revised code and text from this work. OpenAI Codex
+assisted with revisions to the README, presentation and report, and drafted and integrated this declaration.
+The introduction video on slide 2 uses Microsoft Edge neural text-to-speech (the `en-US-SteffanNeural` voice)
+via `edge-tts` to synthesise narration from the video script.
+[Claude Code](https://code.claude.com/docs/en/overview) · [OpenAI Codex](https://openai.com/codex/) · [Video narration source](presentation/video/README.md)
+
+**Examples of instructions given.** We asked Claude Code to explore a Bitcoin project on solo mining, electricity
+prices across economies and the GPU and ASIC eras, then to consider how much future analysis to include. We asked
+Codex to revise the presentation while retaining its theme and to prepare the AI-use declaration using the
+University’s GAI guidelines. These are paraphrases of project prompts.
+
+**Review and responsibility.** The team chose the Bitcoin topic and takes responsibility for the research questions,
+method choices, source attribution and conclusions. The project records corrections to agent-assisted work. For
+example, we changed the data source when automated retries failed after the download quota was exhausted and
+checked for missing block heights. We also revised the association-rule thresholds after an initial run returned
+zero rules and tested the Future Lab method against historical data. The team is responsible for checking the
+accuracy, possible bias and reuse rights of material retained from AI outputs.
+
+The report gives further examples and verification evidence in §15. The trajectory index identifies where each
+member’s own record of tools, prompts, responses and revisions belongs for the course submission.
+[Technical report](reports/technical_report.pdf) · [Agent-use trajectory index](agent_trajectories/README.md) ·
+[Lingnan University GAI Guidelines and Best Practices](https://www.ln.edu.hk/cital/generative-artificial-intelligence/gai-guidelines-best-practices)
 
 ## Requirements
 

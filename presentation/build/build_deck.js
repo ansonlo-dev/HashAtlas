@@ -549,6 +549,34 @@ pres.addSection({ title: "Appendix" });
 
   });
 }
+{
+  const s = slide("APPENDIX", "Appendix", "", "A5 · Declaration of Use of AI-agent", "", { untimed: true });
+  const names = `${M.slice(0, -1).join(", ")} and ${M.at(-1)}`;
+  const declaration = `We, ${names}, declare that generative artificial intelligence (GAI) tools were used to prepare the submitted work for CDS3004 Data Mining at Lingnan University (2026/27 Term 1), Group D’s HashAtlas group project.`;
+  const use = "Claude Code helped explore project alternatives and generated initial code for data preparation and modelling. Parts of the dashboard, report and slides also incorporate agent-generated or agent-revised material. OpenAI Codex helped revise the deliverables and drafted this declaration. Microsoft Edge neural text-to-speech generated the video narration.";
+  const review = "The team selected the Bitcoin topic and takes responsibility for the methods, evidence, attribution and conclusions. Project verification included checking for missing block heights, revising rule thresholds after an empty run and backtesting the Future Lab method.";
+
+  T(s, declaration, { x: 0.6, y: 1.42, w: 12.1, h: 1.18, fontSize: 18 });
+  const panels = [["Use of tools and outputs", use], ["Review and responsibility", review]];
+  panels.forEach(([heading, body], i) => {
+    const x = 0.6 + 6.2 * i;
+    card(s, x, 2.78, 5.9, 3.42);
+    T(s, heading, { x: x + 0.25, y: 3.01, w: 5.4, h: 0.42, fontSize: 20, bold: true, color: HEX.btcDeep });
+    T(s, body, { x: x + 0.25, y: 3.53, w: 5.4, h: 2.39, fontSize: 17, color: HEX.text2 });
+  });
+
+  const repo = "https://github.com/ansonlo-dev/HashAtlas";
+  const link = (text, url) => ({ text, options: { hyperlink: { url }, color: HEX.btcDeep } });
+  T(s, [
+    link("Report §15 and §18", `${repo}/blob/main/reports/technical_report.md#15-declaration-of-use-of-ai-agent`),
+    { text: "   ·   " },
+    link("Agent-use trajectory index", `${repo}/tree/main/agent_trajectories`),
+    { text: "   ·   " },
+    link("Lingnan University GAI guidelines §2", "https://www.ln.edu.hk/tlc/f/page/107180/326402/Guidelines%20for%20Using%20GAI%20Tools%20%28Oct%202024%29.pdf"),
+  ], { x: 0.6, y: 6.48, w: 12.1, h: 0.32, fontSize: 13 });
+
+  s.addNotes(`${declaration}\n\n${use}\n\n${review}\n\nExample prompts, paraphrased: we asked Claude Code to consider solo Bitcoin mining, electricity prices across economies and the GPU and ASIC eras, and to advise on the scope of future analysis. We asked Codex to improve the slides within the existing theme and to draft the declaration against the University guidance. The voice in the introduction video is en-US-SteffanNeural, accessed through edge-tts. Report sections 15 and 18 give the verification examples, tool references and further details. Each member’s own trajectory records their prompts, responses and revisions for submission.`);
+}
 
 module.exports = { SCRIPT };
 
