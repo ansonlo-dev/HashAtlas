@@ -192,8 +192,9 @@ fingerprints, mining eras, pool families and miner decisions across
 Asia}
 \newcommand{\ReportDate}{CDS3004 Data Mining, Lingnan University,
 2026/27 Term 1 · 14 November 2026}
-\newcommand{\ReportTeam}{Team HashAtlas · LO Chi Kong, POON Tsz Chun,
-SUBEDI Anukaran, YE Xiaochen, LO Ka Hung · CRN 234}
+\newcommand{\ReportTeam}{Team HashAtlas · LO Chi Kong (4672784), POON
+Tsz Chun (4673116), SUBEDI Anukaran (4139990), YE Xiaochen (4592439), LO
+Ka Hung (4455916) · CRN 234}
 \newcommand{\ReportShortTitle}{HashAtlas · CDS3004 Group Project Report}
 \newcommand{\ReportKind}{CDS3004 Data Mining · Group Project Report}
 
@@ -1817,9 +1818,9 @@ model, cluster and rule outputs, and dashboard data export.
 \Needspace{12.6\baselineskip}\begin{reporttable}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2101}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3878}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4021}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1907}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3978}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4115}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Member}
@@ -1843,38 +1844,37 @@ dictionary, quality checks and label audit; Integrated the pipeline
 theme, deployment and the introduction video; compiled the final report
 and submission. Code:
 \code{src/\allowbreak{}hashatlas/\allowbreak{}config.\allowbreak{}py,\allowbreak{} cli.\allowbreak{}py,\allowbreak{} acquire.\allowbreak{}py,\allowbreak{} clean.\allowbreak{}py,\allowbreak{} report.\allowbreak{}py; configs/\allowbreak{}; web/\allowbreak{}src/\allowbreak{}App.\allowbreak{}tsx,\allowbreak{} styles.\allowbreak{}css,\allowbreak{} pages/\allowbreak{}Overview.\allowbreak{}tsx,\allowbreak{} pages/\allowbreak{}Methods.\allowbreak{}tsx; presentation/\allowbreak{}video/\allowbreak{}} \\
-POON Tsz Chun ({[}student ID{]}) & Feature transformation, feature
-selection and model learning (§5-7) & Designed the fingerprint features
-(version/nonce bit decomposition, body ratios, day-relative policy) and
-the leakage exclusions; Ran feature selection: variance filter, mutual
-information against noise probes, Spearman redundancy and group
-ablation; Tuned the decision tree, KNN and linear/RBF SVM with
-month-grouped and nested cross-validation; froze the model choice before
-testing. Code:
+POON Tsz Chun (4673116) & Feature transformation, feature selection and
+model learning (§5-7) & Designed the fingerprint features (version/nonce
+bit decomposition, body ratios, day-relative policy) and the leakage
+exclusions; Ran feature selection: variance filter, mutual information
+against noise probes, Spearman redundancy and group ablation; Tuned the
+decision tree, KNN and linear/RBF SVM with month-grouped and nested
+cross-validation; froze the model choice before testing. Code:
 \code{src/\allowbreak{}hashatlas/\allowbreak{}features.\allowbreak{}py,\allowbreak{} train.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Simulator.\allowbreak{}tsx,\allowbreak{} lib/\allowbreak{}tree.\allowbreak{}ts} \\
-SUBEDI Anukaran ({[}student ID{]}) & Performance evaluation, model
-explanation and decisions on new blocks (§8, 11 (unattributed and
-post-freeze blocks)) & Evaluated the frozen models on the sealed 2025-26
-test period: macro-F1, confusion, ROC/PR, day-block bootstrap and drift;
+SUBEDI Anukaran (4139990) & Performance evaluation, model explanation
+and decisions on new blocks (§8, 11 (unattributed and post-freeze
+blocks)) & Evaluated the frozen models on the sealed 2025-26 test
+period: macro-F1, confusion, ROC/PR, day-block bootstrap and drift;
 Explained the tree (worked Gini split, permutation importance) and
 mapped newcomer pools to their nearest template; Applied the frozen
 model to unattributed blocks and to blocks mined after the data freeze;
 produced the report figures. Code:
 \code{src/\allowbreak{}hashatlas/\allowbreak{}evaluate.\allowbreak{}py,\allowbreak{} explain.\allowbreak{}py,\allowbreak{} predict.\allowbreak{}py,\allowbreak{} figures.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Radar.\allowbreak{}tsx} \\
-YE Xiaochen ({[}student ID{]}) & Clustering, association rules and
-independent verification (§9, 10, 13) & Rediscovered the mining eras
-with K-means, four hierarchical linkages and DBSCAN; built pool families
-by dendrogram; Implemented Apriori from scratch with brute-force
+YE Xiaochen (4592439) & Clustering, association rules and independent
+verification (§9, 10, 13) & Rediscovered the mining eras with K-means,
+four hierarchical linkages and DBSCAN; built pool families by
+dendrogram; Implemented Apriori from scratch with brute-force
 verification, rule confirmation on a later window and the solo contrast;
 Wrote the independent verification checks and the unit-test suite; led
 the interpretation and limitations review. Code:
 \code{src/\allowbreak{}hashatlas/\allowbreak{}clusters.\allowbreak{}py,\allowbreak{} rules.\allowbreak{}py,\allowbreak{} verify.\allowbreak{}py; tests/\allowbreak{}; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Eras.\allowbreak{}tsx,\allowbreak{} Rules.\allowbreak{}tsx} \\
-LO Ka Hung ({[}student ID{]}) & Decision support, Future Lab, dashboard
-data and ethics (§11 (miner advisor), 12, 14) & Built the miner advisor:
-pool vs solo vs switch off across devices and 27 economies; Built the
-Future Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and
-the historical backtest; Exported the dashboard data, built the Advisor
-and Future Lab pages and ran the live demo; led the ethics review. Code:
+LO Ka Hung (4455916) & Decision support, Future Lab, dashboard data and
+ethics (§11 (miner advisor), 12, 14) & Built the miner advisor: pool vs
+solo vs switch off across devices and 27 economies; Built the Future
+Lab: block-bootstrap hash-rate scenarios, 2028 halving timing and the
+historical backtest; Exported the dashboard data, built the Advisor and
+Future Lab pages and ran the live demo; led the ethics review. Code:
 \code{src/\allowbreak{}hashatlas/\allowbreak{}decide.\allowbreak{}py,\allowbreak{} future.\allowbreak{}py,\allowbreak{} webdata.\allowbreak{}py; web/\allowbreak{}src/\allowbreak{}pages/\allowbreak{}Advisor.\allowbreak{}tsx,\allowbreak{} Future.\allowbreak{}tsx,\allowbreak{} lib/\allowbreak{}econ.\allowbreak{}ts} \\
 \end{longtable}
 

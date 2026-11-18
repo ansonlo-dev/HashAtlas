@@ -1,8 +1,6 @@
 # Q&A preparation and presenter checklist
 
-The 20-minute slot is planned as a 1:30 intro video + ~16:30 speaking (3:14–3:23 per presenter, including a 90-second live demo) + ~2:00 buffer; Q&A is extra (timings in `timing_check.csv`, full script in
-`slide_by_slide_script.md`, also in the speaker notes of `HashAtlas.pptx`). Each member answers questions on the stage
-they own.
+The team plan allows 20 minutes plus Q&A. The timed run includes a 90-second team introduction and a 90-second live demo. Use the cumulative slide deadlines in `timing_check.csv`. The YouTube link on slide 19 is for viewing afterwards. Each member answers questions about their stage.
 
 ## Hand-overs
 
@@ -13,7 +11,7 @@ they own.
 | 9-11 (results, confusion, new blocks) | SUBEDI Anukaran | "YE Xiaochen continues with clustering." |
 | 12-14 (eras, families and rules, limits and checks) | YE Xiaochen | "LO Ka Hung will now turn the results into decisions." |
 | 15-17 (advisor, live demo, Future Lab) | LO Ka Hung | "LO Chi Kong will close." |
-| 18-19 (conclusion, Q&A) | LO Chi Kong, then everyone | Each member answers for their own stage. |
+| 18–20 (conclusion, further viewing, Q&A) | LO Chi Kong, then everyone | Each member answers for their own stage. |
 
 ## Likely questions and short answers
 
@@ -37,5 +35,5 @@ they own.
 - [ ] Two timed rehearsals with hand-overs and the live demo; record the actual times in `timing_check.csv`.
 - [ ] Laptop on mains power; dashboard open on the Overview page; second tab with Block Radar.
 - [ ] Demo fallback: if the network fails, use the screenshot on slide 16 and `reports/screenshots/`.
-- [ ] Speak to the audience, not the slides; one presenter clicks for the demo.
+- [ ] Speak to the audience, not the slides; pause for the opening question, make eye contact, and point to the comparison before quoting the numbers. Practise saying “terahash”, “Gini” and “Apriori” aloud.
 - [ ] Professional attire; arrive 15 minutes early; test the projector and HDMI/USB-C adapter.

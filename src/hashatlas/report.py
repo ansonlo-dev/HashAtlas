@@ -124,7 +124,7 @@ def build_markdown() -> str:
     md.append(f'''---
 title: "HashAtlas: Can a Small Bitcoin Miner Still Win?"
 subtitle: "Mining 975,494 Bitcoin blocks for miner fingerprints, mining eras, pool families and miner decisions across Asia"
-team: "Team {team['team_name']} · {', '.join(m['name'] for m in members)} · CRN {team['crn']}"
+team: "Team {team['team_name']} · {', '.join(f"{m['name']} ({m['student_id']})" for m in members)} · CRN {team['crn']}"
 date: "{team['course']} · {today}"
 ---
 
