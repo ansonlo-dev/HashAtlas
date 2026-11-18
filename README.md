@@ -1,27 +1,45 @@
 # HashAtlas: Can a Small Bitcoin Miner Still Win?
 
-**CDS3004 Data Mining group project** (Lingnan University, 2026/27 Term 1, CRN 234). Team HashAtlas, five members;
-names, roles and contributions are in [`configs/team.json`](configs/team.json) and section 17 of the report.
+**Lingnan University · CDS3004 Data Mining · Group D · 26/27 Sem 1 · CRN 234**
 
-| Submission item | Where |
-|---|---|
-| GitHub repository (public, full commit history) | **https://github.com/ansonlo-dev/HashAtlas** |
-| Project report (PDF, with each member's contributions) | [`reports/technical_report.pdf`](reports/technical_report.pdf) |
-| Presentation (~16 min, five presenters) and script | [`presentation/HashAtlas.pptx`](presentation/HashAtlas.pptx), [`.pdf`](presentation/HashAtlas.pdf), [`slide_by_slide_script.md`](presentation/slide_by_slide_script.md) |
-| Agent-use trajectories (one per member) | [`agent_trajectories/README.md`](agent_trajectories/README.md) |
-| Live interactive dashboard | <https://cds3004.ansonlo.dev/> |
-| Submission checklist and rubric map | [`SUBMISSION.md`](SUBMISSION.md) |
+[![HashAtlas project banner showing the study scope: 975,494 Bitcoin blocks, 17 years and 27 economies](web/public/og.png)](https://cds3004.ansonlo.dev/)
 
-We mined the complete Bitcoin block history (every block since 3 January 2009, labelled with its miner) to answer
-three questions:
+**[Open the live dashboard](https://cds3004.ansonlo.dev/)** · [Research figures](#research-figures) · [Sample slides](#sample-slides) · [Project report](reports/technical_report.pdf) · [Reproduce the analysis](#reproduce)
 
-1. **Classification**: can a block's *behavioural fingerprint* (version-bit rolling, nonce bits, timestamps, how it
-   is filled) reveal who mined it, a pool or a solo miner, without reading the miner's name? (decision tree, KNN,
-   linear and RBF SVM, month-grouped and nested cross-validation, sealed out-of-time test)
-2. **Clustering and association rules**: do the data rediscover the CPU → GPU → ASIC eras by themselves, and which
-   pools build blocks alike? (K-means, four hierarchical linkages, DBSCAN; Apriori implemented from scratch)
-3. **Decisions**: should a miner in Hong Kong or elsewhere in Asia mine in a pool, mine solo as a lottery, or switch
-   off, today and after the 2028 halving? (miner advisor across 27 economies, scenario Future Lab with a backtest)
+HashAtlas uses 975,494 Bitcoin blocks to study how miners build blocks, how mining changed across hardware eras, and how electricity prices affect the choice to mine solo, join a pool, or switch off.
+
+<details>
+<summary>Play the animated project preview</summary>
+
+![Animated SVG cycling through the project themes: fingerprint Bitcoin blocks, trace the mining eras, and compare mining scenarios](https://readme-typing-svg.demolab.com/?size=21&duration=2500&pause=750&color=F6C779&background=1F1A15&center=true&vCenter=true&width=580&height=50&lines=Fingerprint+Bitcoin+blocks;Trace+the+mining+eras;Compare+mining+scenarios)
+
+</details>
+
+## Dashboard demo
+
+<a href="https://cds3004.ansonlo.dev/#/overview"><img src="reports/screenshots/deployed/web-1440-overview.png" width="600" alt="Deployed HashAtlas Overview showing Bitcoin hash rate, mining eras, pool market share and solo-mining odds"></a>
+
+The screenshot shows the deployed desktop Overview. Open the interactive views to [inspect post-freeze blocks](https://cds3004.ansonlo.dev/#/radar), [change a block's fingerprint](https://cds3004.ansonlo.dev/#/simulator), [compare mining costs across 27 economies](https://cds3004.ansonlo.dev/#/advisor), or [explore scenarios for the 2028 halving](https://cds3004.ansonlo.dev/#/future).
+
+[More deployed screenshots, including mobile views](reports/screenshots/deployed)
+
+## Research figures
+
+### Can a block's behaviour identify its miner?
+
+[![Model comparison on the sealed test set, with the decision tree leading on macro-F1](reports/figures/f07_model_comparison.png)](reports/figures/f07_model_comparison.png)
+
+The models use block-construction features such as version bits, nonce bits and block fullness. The decision tree led KNN and the SVMs on the sealed out-of-time test after model selection with month-grouped and nested cross-validation.
+
+### Do block patterns recover Bitcoin's mining eras?
+
+[![Timeline comparing the era assignments from Ward linkage, K-means and DBSCAN with documented hardware eras](reports/figures/f13_eras_timeline.png)](reports/figures/f13_eras_timeline.png)
+
+Weekly block patterns broadly recover the transition from hobbyist mining to industrial ASIC mining. The [pool dendrogram](reports/figures/f14_pool_dendrogram.png) and [Apriori rules](reports/figures/f15_rules.png) show which pools build similar blocks.
+
+### Can a small miner cover electricity costs?
+
+The [solo-mining odds](reports/figures/f03_solo_odds.png), [Miner Advisor results](reports/figures/f16_advisor.png) and [Future Lab scenarios](reports/figures/f17_future.png) put the chances of a block reward alongside electricity costs and the projected effects of the 2028 halving.
 
 <!-- KEY RESULTS START -->
 ## Key results
@@ -37,6 +55,29 @@ three questions:
 | Future Lab | 2028 halving ~2028-04-07; backtest 80% band coverage 75% |
 | Verification | 17/17 independent checks passed |
 <!-- KEY RESULTS END -->
+
+## Sample slides
+
+| Slide | What it shows |
+|---|---|
+| [09 · How well does the tree identify a pool?][slide-09] | Sealed-test model comparison and top-three accuracy |
+| [12 · Weekly block patterns reveal three mining eras][slide-12] | How Ward, K-means and DBSCAN compare with documented hardware eras |
+| [15 · Should you mine in Hong Kong?][slide-15] | Break-even electricity prices and results for four mining devices |
+
+[slide-09]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=9
+[slide-12]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=12
+[slide-15]: https://cdn.jsdelivr.net/gh/ansonlo-dev/HashAtlas@95ef55d700fd1513ae548be9bb5a32e92bef6b58/presentation/HashAtlas.pdf#page=15
+
+[Full slide deck (PDF)](presentation/HashAtlas.pdf) · [PowerPoint](presentation/HashAtlas.pptx) · [Speaker script](presentation/slide_by_slide_script.md) · [90-second introduction video](presentation/video/hashatlas_intro.mp4)
+
+## Project materials
+
+| Material | Where |
+|---|---|
+| Technical report and individual contributions | [Report PDF](reports/technical_report.pdf), section 17 |
+| Team membership and roles | [Team HashAtlas (five members)](configs/team.json) |
+| Agent-use trajectories | [Per-member records](agent_trajectories/README.md) |
+| Submission checklist and rubric map | [Submission guide](SUBMISSION.md) |
 
 ## Requirements
 
