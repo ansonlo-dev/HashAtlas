@@ -499,7 +499,7 @@ pres.addSection({ title: "Closing" });
 
 // Q&A (not timed)
 {
-  const s = slide("SECTION", "Closing", "All", "Thank you · Questions",
+  const s = slide("SECTION", "Closing", "All", "Thank you\u200B",
     "Invite questions; each member answers for their own stage (see the Q&A sheet).", { untimed: true });
   bitcoin(s, 10.2, 3.0, 1.7);
   T(s, "HASHATLAS", { x: 0.8, y: 1.9, w: 6, h: 0.5, fontSize: 18, bold: true, color: HEX.btc, charSpacing: 8 });
@@ -540,7 +540,7 @@ pres.addSection({ title: "Appendix" });
     x: 0.6, y: 1.4, w: 12.1, colW: [4.1, 2, 2, 2, 2], fontSize: 18, fontFace: BODY, border: { type: "solid", color: HEX.line, pt: 0.75 }, margin: 0.06 });
 }
 {
-  const s = slide("APPENDIX", "Appendix", "", "A4 · Who did what", "Backup: member contributions (also in report section 17).", { untimed: true });
+  const s = slide("APPENDIX", "Appendix", "", "A4 · Task Division\u200B", "Backup: member contributions (also in report section 17).", { untimed: true });
   team.members.forEach((m, i) => {
     card(s, 0.6, 1.35 + i * 1.08, 12.1, 0.95);
     T(s, m.name + (m.captain ? " (captain)" : ""), { x: 0.85, y: 1.45 + i * 1.08, w: 2.7, h: 0.4, fontSize: 15, bold: true, color: HEX.btcDeep });
